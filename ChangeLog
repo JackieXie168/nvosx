@@ -1,6 +1,10 @@
 Initial version
 20091117 
-	remove non-nvram functions.
-	import nvram to Mac OS X.
+	．remove non-nvram functions.
+	．import nvram to Mac OS X.
+
 20091118
-	add a 'test' example to verify nvram.
+	．add a 'test' example to verify nvram.
+
+20141103
+	．integrate parsing functions into nvram.
