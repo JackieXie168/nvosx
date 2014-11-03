@@ -1,0 +1,36 @@
+	NVRAM Utility README file.
+	Copyright (c) 2014, Jackie Xie <Jackie.CPlusPlus@gmail.com>
+	
+	An utility to query and change NVRAM contents from the command line.
+	
+	This is the main documentation for the nvram utility by Jackie Xie.
+
+How do I save/restore the whole NVRAM contents?
+-----------------------------------------------
+There is no special command to do this; but there's a field "nvram" in the
+standard configuration files which is same as useful. To save the whole NVRAM
+contents (aside from the time/date of the clock), do
+
+	# nvram show >nvram.saved
+
+To restore the whole contents, do
+
+	# nvram restore nvram.saved
+
+or
+
+	# nvram reload nvram.saved
+
+The saved contents is restored into the NVRAM in verbatim. Please notice that is 
+very unlikely that the saved NVRAM contents is useful for any other computer 
+than the one it was being saved on.
+
+
+
+How do I parsing the NVRAM variable contents?
+-----------------------------------------------
+To use the nvlist utility to do related functions.
+It could be to check the verify tool 'test_nvlist.sh' to get more information in detail.
+
+
+ END OF README

@@ -1,0 +1,13 @@
+#!/bin/sh
+cd /tmp
+#cp -f /tmp/config/nvram.config /etc/nvram/back.config
+mkfs.jffs2 -r config -o config.bin -b --pad=0x10000 --erase=0x10000
+#Note: U must leave the /mnt dir then u can do umount
+umount /tmp/mnt
+echo "unoumt mtdblock5"
+#dd if=config.bin of=/dev/mtdblock5
+flash_eraseall /dev/mtd10
+cat config.bin > /dev/mtd10
+mount -t jffs2 /dev/mtdblock5 /tmp/mnt
+echo "mount mtdblock5"
+rm -f config.bin

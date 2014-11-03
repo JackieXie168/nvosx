@@ -1,0 +1,12 @@
+#!/bin/sh
+#Add by Jackie Xie
+
+export TARGET_ROOT_DIR=/var/nvram/conf/
+
+if [ ! -d /var/nvram/conf/ ]; then \
+   echo Create directory /var/nvram/conf/ ; \
+   mkdir -p /var/nvram/conf/ ; \
+fi
+
+nvram show > /var/nvram/conf/nvram.config
+

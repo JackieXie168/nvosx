@@ -1,0 +1,6 @@
+Initial version
+20091117 
+	remove non-nvram functions.
+	import nvram to Mac OS X.
+20091118
+	add a 'test' example to verify nvram.
