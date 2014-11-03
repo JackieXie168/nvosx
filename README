@@ -29,8 +29,8 @@ than the one it was being saved on.
 
 How do I parsing the NVRAM variable contents?
 -----------------------------------------------
-To use the nvlist utility to do related functions.
-It could be to check the verify tool 'test_nvlist.sh' to get more information in detail.
+To use the nvram utility to do related functions.
+It could be to check the verify tool 'test_nvram.sh' to get more information in detail.
 
 
  END OF README
