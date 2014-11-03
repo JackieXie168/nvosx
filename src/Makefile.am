@@ -8,8 +8,6 @@ else
 bin_PROGRAMS= nvram
 endif
 
-bin_PROGRAMS += nvlist
-
 #Build in these directories:
 
 COMMON_FILES=\
@@ -41,10 +39,6 @@ libnvram_1_0_la_SOURCES= $(h_sources) $(c_sources)
 libnvram_1_0_la_CFLAGS = -fPIC $(AM_CFLAGS)
 #libnvram_1_0_la_LIBADD= libnvram.la
 libnvram_1_0_la_LDFLAGS= -version-info $(GENERIC_LIBRARY_VERSION) -release $(GENERIC_RELEASE)
-
-nvlist_SOURCES = nvlist.c
-nvlist_CPPFLAGS = -I$(top_srcdir)/include
-nvlist_LDADD = $(top_srcdir)/src/libnvram-1.0.la -dlopen $(top_srcdir)/src/libnvram-1.0.la
 
 METASOURCES = AUTO
 #DISTCLEANFILES = Makefile.in
