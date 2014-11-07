@@ -17,6 +17,6 @@ rm -f *.tar.* *.tgz
 # Also remove the autotools cache directory.
 rm -Rf autom4te.cache
 # Remove rest of the generated files.
-rm -f aclocal.m4 configure config.h.in depcomp install-sh missing compile config.* test-driver ltmain.sh
+rm -f aclocal.m4 configure config.h.in depcomp install-sh missing compile config.* configure.scan test-driver ltmain.sh
 find . -name Makefile.in -exec rm -f {} \;
 find . -name *~ -exec rm -f {} \;
