@@ -25,6 +25,9 @@ The saved contents is restored into the NVRAM in verbatim. Please notice that is
 very unlikely that the saved NVRAM contents is useful for any other computer 
 than the one it was being saved on.
 
+When you got an error such as "attach_share_memory failed ..." for running nvram,
+you should execute the "./remove_shm.sh" or "./remove_shm.csh" under src path to 
+release the allocated memory first.
 
 
 How do I parsing the NVRAM variable contents?
