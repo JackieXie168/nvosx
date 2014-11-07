@@ -3,6 +3,8 @@ Changelog
 	20141107
 		．improve the file operations and security.
 		．improve the nvram actions behaviors.
+		．improve the return null issue in linux.
+		．correct $cfg path in test_nvram.sh 
 
 	20141103
 		．integrate parsing functions into nvram.
@@ -10,8 +12,8 @@ Changelog
 	20091118
 		．add a 'test' example to verify nvram.
 
-20091117 
-	．remove non-nvram functions.
-	．import nvram to Mac OS X.
+	20091117 
+		．remove non-nvram functions.
+		．import nvram to Mac OS X.
 
 	Initial version

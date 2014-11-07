@@ -488,7 +488,7 @@ nvram_get(name)
 	}
 	//printf ("nvram_get found no var\n");
 	INTON;
-	return NULL;
+	return return_null(NULL);
 }
 
 //extern char flag_reload_nvram;
@@ -874,7 +874,6 @@ int nvram_backup(char *ofile)
 		attach_share_memory();
 
 #ifndef TARGET_DEVICE
-	printf ("\n\nNVRAM : Create configuration path : %s !!!\n", CONF_PATH);
 	mkdir_r(CONF_PATH);
 	printf("\nnvram_backup() : %d\n", get_nvram_log());
 	printf("Configuration is backup !\n");

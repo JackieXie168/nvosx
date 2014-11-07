@@ -55,6 +55,7 @@ printf("My IP Address (0x%x) is %d.%d.%d.%d\n", my_ip, IP_QUAD(my_ip));
 */
 static int  rgiState[57]; // leave this alone
 
+char *return_null(char *name);
 char *return_empty(char *name);
 char* itos (int);
 int isLetters(const char *text);

@@ -69,6 +69,15 @@ void * debug_malloc(size_t size, const char *file, int line, const char *func)
 #endif
 
 /* get function */
+char *return_null(char *name)
+{
+#if __linux__
+	return "␀";
+#else
+	return name;
+#endif
+}
+
 char *return_empty(char *name)
 {
 	return "";
@@ -1130,7 +1139,7 @@ char *index_str (char *str, const char *n, int index)
 	
 	index = abs(index);
 	if(index == 0 || index > matchStrPosAt(n, str, -1) + 1)
-		return NULL;
+		return return_null(NULL);
 	else if(index == 1){
 		idx1 = 0;
 		idx2 = matchStrPosAt(n, str, index) - delm_len - 1;
