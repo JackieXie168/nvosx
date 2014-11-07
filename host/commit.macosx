@@ -1,12 +1,12 @@
 #!/bin/sh
 #Add by Jackie Xie
 
-export TARGET_ROOT_DIR=/var/conf/
+export TARGET_ROOT_DIR=$HOME/var/conf/
 
-if [ ! -d /var/conf/ ]; then \
-   echo Create directory /var/conf/ ; \
-   mkdir -p /var/conf/ ; \
+if [ ! -d $HOME/var/conf/ ]; then \
+   echo Create directory $HOME/var/conf/ ; \
+   mkdir -p $HOME/var/conf/ ; \
 fi
 
-xnvram show > /var/conf/nvram.conf
+xnvram show > $HOME/var/conf/nvram.conf
 

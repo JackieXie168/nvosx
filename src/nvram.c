@@ -380,6 +380,11 @@ void nvram_accessfile()
 	char line[2048];
 	FILE *fp_ptr=NULL;
 	
+	if(!exists(TMP_FILE_PATH)) {
+		fp_ptr = fopen(DEFAULT_FILE_PATH,"a+");
+		close(fp_ptr);
+	}
+
 	/*open NVRAM file*/
 	if(get_nvram_log() == 1 || get_nvram_log() == 4){
 		fp_ptr=fopen(TMP_FILE_PATH,"w+");
@@ -869,7 +874,8 @@ int nvram_backup(char *ofile)
 		attach_share_memory();
 
 #ifndef TARGET_DEVICE
-	mkdir("/var/nvram/conf", O_CREAT);
+	printf ("\n\nNVRAM : Create configuration path : %s !!!\n", CONF_PATH);
+	mkdir_r(CONF_PATH);
 	printf("\nnvram_backup() : %d\n", get_nvram_log());
 	printf("Configuration is backup !\n");
 	if(get_nvram_log() >= 1){
@@ -965,7 +971,8 @@ nvram_commit()
 
 	//fp=fopen(DEVICE_PATH,"w+");
 #ifndef TARGET_DEVICE
-	mkdir("/var/nvram/conf", O_CREAT);
+	printf ("\n\nNVRAM : Create configuration path : %s !!!\n", CONF_PATH);
+	mkdir_r(CONF_PATH);
 	printf("\nnvram_commit() : commit=%d\n", get_nvram_log());
 	printf("Configuration is commited !\n");
 	if(get_nvram_log() >= 1){
@@ -1242,7 +1249,6 @@ nvram_init()
 //			printf ("create share memory(var) error\n");
 		/* to default */
 		/*open NVRAM_DEFAULT file*/
-
 		fp_ptr=fopen(DEFAULT_FILE_PATH,"r");
 		if (fp_ptr==NULL)
 		{

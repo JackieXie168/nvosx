@@ -75,6 +75,7 @@ char *GetStrBetweenStr(char *, char *, char *);
 char *StrDup(const char *s);
 void StrFree(void *);
 char *StrCat(char *, const char *);
+char* __concat(int count, ...);
 int matchStrPosAt(const char *, char *, int);
 char* replacestr(const char* s, char* in, char* out, int delimiters);
 char* replaceall(const char * source, char * in, char * out, int delimiters, int max);
@@ -97,6 +98,9 @@ char *str2digits(char *sval, char *delimiter, int length);
 int str2id(char *sval, char *delimiter);
 char *get_one_line(char *s, int n, FILE *f);
 int mac_validator(const char* value);
+
+#define NUMARGS(...)  (sizeof((char *[]){__VA_ARGS__})/sizeof(char *))
+#define concat(...)  (__concat(NUMARGS(__VA_ARGS__), __VA_ARGS__))
 
 /*
  * Reads file and returns contents

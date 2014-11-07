@@ -472,6 +472,35 @@ char *StrCat(char *src, const char *dest)
 	return src;
 }
 
+char* __concat(int count, ...)
+{
+    va_list ap;
+    int i;
+
+    // Find required length to store merged string
+    int len = 1; // room for NULL
+    va_start(ap, count);
+    for(i=0 ; i<count ; i++)
+        len += strlen(va_arg(ap, char*));
+    va_end(ap);
+
+    // Allocate memory to concat strings
+    char *merged = calloc(sizeof(char),len);
+    int null_pos = 0;
+
+    // Actually concatenate strings
+    va_start(ap, count);
+    for(i=0 ; i<count ; i++)
+    {
+        char *s = va_arg(ap, char*);
+        strcpy(merged+null_pos, s);
+        null_pos += strlen(s);
+    }
+    va_end(ap);
+
+    return merged;
+}
+
 unsigned char* ConvertStringIntoByte(char *pszStr, unsigned char* pbyNum)
 {
 	//const char cSep0 = NULL ; //Bytes separator in string like 00aabbccddee
@@ -559,6 +588,39 @@ int xasprintf(char **bufp, const char *format, ...)
   va_end(ap);
 
   return rv;
+}
+
+int mkdir_r(const char *path)
+{
+	mode_t mode = (S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH);
+	if (path == NULL) {
+		return -1;
+	}
+	char *tmp = StrDup(path);
+	char *pos = tmp;
+
+	/* skip over slashes */
+	if (strncmp(tmp, "/", 1) == 0) {
+		pos += 1;
+	} else if (strncmp(tmp, "./", 2) == 0) {
+		pos += 2;
+	}
+	/* create directories recursively */
+	for ( ; *pos != '\0'; ++ pos) {
+		if (*pos == '/') {
+			*pos = '\0';
+			mkdir(tmp, mode);
+			printf("for %s\n", tmp);
+			*pos = '/';
+		}
+	}
+	/* stop to create directories recursively if it's at last slash */
+	if (*(pos - 1) != '/') {
+		printf("if %s\n", tmp);
+		mkdir(tmp, mode);
+	}
+	StrFree(tmp);
+	return 0;
 }
 
 #if defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(darwin)

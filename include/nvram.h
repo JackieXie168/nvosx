@@ -15,6 +15,7 @@
 #define _nvram.h_
 
 #ifndef _LANGUAGE_ASSEMBLY
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +28,7 @@
 //#include <typedefs.h>
 #include <typedefs.h>
 #include <unistd.h>
+#include <shutils.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,17 +70,16 @@ struct varinit {
 #define MAGIC_ID "<NVRAM>"
 
 #if __linux__
-//#define TARGET_DEVICE					DV_E5322S_R
-#define _PATH_CONFIG						"/tmp/conf"
+#define _PATH_CONFIG						concat(safe_getenv("HOME"), "/tmp/conf")
 #define CONF_PATH							_PATH_CONFIG "/"
 #elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(darwin)
-#define _PATH_CONFIG						"/var/conf"
-#define CONF_PATH							_PATH_CONFIG "/"
+#define _PATH_CONFIG						concat(safe_getenv("HOME"), "/var/conf")
+#define CONF_PATH							concat(_PATH_CONFIG, "/")
 //#define SO_NO_CHECK     				0xb
 #define SO_NO_CHECK     				0x100a
-#elif defined(__CYGWIN__) || defined(_MSC_VER)
-#define _PATH_CONFIG						"c:\\temp"
-#define CONF_PATH							_PATH_CONFIG "\\"
+#elif defined(__CYGWIN__) || defined(_MSC_VER) || defined(__MINGW32__)
+#define _PATH_CONFIG						concat(safe_getenv("HOMEDRIVE"), safe_getenv("HOMEPATH"), "\\temp")
+#define CONF_PATH							concat(_PATH_CONFIG, "\\")
 #endif
 
 #ifdef TARGET_DEVICE
@@ -91,12 +92,12 @@ struct varinit {
 //#define TMP_FILE_PATH "/tmp/config/nvram.config"
 //##define TMP_FILE_PATH "/var/run/rc.conf"
 #else
-#define LOG_FILE_PATH 					CONF_PATH "nvram.log"
-#define BACKUP_FILE_PATH 			CONF_PATH "nvram.bak"
-#define DEFAULT_FILE_PATH 		CONF_PATH "nvram.conf"
-#define DEFAULT_FILE_PATH_EU 	CONF_PATH "nvram_eu.conf"
-#define REGION_FILE_PATH 			CONF_PATH "firmware_region"
-#define ACTION_FILE     					CONF_PATH "action"
+#define LOG_FILE_PATH 					concat(CONF_PATH, "nvram.log")
+#define BACKUP_FILE_PATH 			concat(CONF_PATH, "nvram.bak")
+#define DEFAULT_FILE_PATH 		concat(CONF_PATH, "nvram.conf")
+#define DEFAULT_FILE_PATH_EU 	concat(CONF_PATH, "nvram_eu.conf")
+#define REGION_FILE_PATH 			concat(CONF_PATH, "firmware_region")
+#define ACTION_FILE     					concat(CONF_PATH, "action")
 #define TMP_FILE_PATH 					DEFAULT_FILE_PATH
 #define _PATH_CONFIG_MTD			TMP_FILE_PATH
 #endif

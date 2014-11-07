@@ -1,10 +1,17 @@
-Initial version
+Changelog
+
+	20141107
+		．improve the file operations and security.
+		．improve the nvram actions behaviors.
+
+	20141103
+		．integrate parsing functions into nvram.
+
+	20091118
+		．add a 'test' example to verify nvram.
+
 20091117 
 	．remove non-nvram functions.
 	．import nvram to Mac OS X.
 
-20091118
-	．add a 'test' example to verify nvram.
-
-20141103
-	．integrate parsing functions into nvram.
+	Initial version

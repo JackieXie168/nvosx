@@ -30,6 +30,7 @@ usage(void)
 	char help_msg[2048];
 
 	sprintf(help_msg, "%s command summary :\n\n", __progname);
+	sprintf(help_msg, "%s\t%s is a utility to set/get value to a given name to/from memory ,  and could parsing contents of nvram variable by delimiter(s).\n", help_msg, __progname);
 	fprintf(stderr, "%s", help_msg);
 #ifndef TARGET_DEVICE
 	fprintf(stderr, "Usage : \n\t%s [get <name>] [set <name>=<value>] [unset <name>] [show] [clean] [commit] [import <file>] [reload <file>] [restore <file>] [backup <file>] [free]\n", __progname);
@@ -42,20 +43,20 @@ usage(void)
 #endif
 
 	sprintf(help_msg, "\t%s [-s | -x <nvram variable>] {[-a | -m <values> -p <position>] | [ -n <to get # of digits>] | [-i <position>] | [-v <value>] | [-e <value>] | [ -r <position>] | [ -o <new delimiter>]} [-d delimiter]\n\n", __progname);
-	sprintf(help_msg, "%s\t%s is a function to insert/delete/modify/view nvram variable by delimiter(s).\n", help_msg, __progname);
-	strcat(help_msg, "\t<nvram variable>：input a nvram variable.\n");
-	strcat(help_msg, "\tdelimiter：a delimiter which is a seperator.\n");
-	strcat(help_msg, "\t-s : to specify a nvram variable.\n");
-	strcat(help_msg, "\t-x : to get total counts of token by specified delimiter.\n");
-	strcat(help_msg, "\t-d : to specify a delimiter.\n");
-	strcat(help_msg, "\t-a：insert a value to the nvram variable by delimiter.\n");
-	strcat(help_msg, "\t-r : remove a value from a nvram variable by specfied position.\n");
-	strcat(help_msg, "\t-v : remove a value from a nvram variable by specfied value.\n");
-	strcat(help_msg, "\t-e : to check a value in a nvram variable is exist or not.\n");
-	strcat(help_msg, "\t-o : to replace delimiters in a token list by new delimiters.\n");
-	strcat(help_msg, "\t-n : to get digits in a nvram variable by speficied counts.\n");
-	strcat(help_msg, "\t-m : to change a value by spcified position from a nvram variable.\n");
-	strcat(help_msg, "\t-i : to return the value which is at the specified position from a nvram variable by delimiter.\n\n");
+	strcat(help_msg, "\tparsing options.\n");
+	strcat(help_msg, "\t\t<nvram variable>：input a nvram variable.\n");
+	strcat(help_msg, "\t\tdelimiter：a delimiter which is a seperator.\n");
+	strcat(help_msg, "\t\t-s : to specify a nvram variable.\n");
+	strcat(help_msg, "\t\t-x : to get total counts of token by specified delimiter.\n");
+	strcat(help_msg, "\t\t-d : to specify a delimiter.\n");
+	strcat(help_msg, "\t\t-a：insert a value to the nvram variable by delimiter.\n");
+	strcat(help_msg, "\t\t-r : remove a value from a nvram variable by specfied position.\n");
+	strcat(help_msg, "\t\t-v : remove a value from a nvram variable by specfied value.\n");
+	strcat(help_msg, "\t\t-e : to check a value in a nvram variable is exist or not.\n");
+	strcat(help_msg, "\t\t-o : to replace old delimiters in a nvram variable by new ones.\n");
+	strcat(help_msg, "\t\t-n : to get digits in a nvram variable by speficied counts.\n");
+	strcat(help_msg, "\t\t-m : to change a value by spcified position from a nvram variable.\n");
+	strcat(help_msg, "\t\t-i : to return the value which is at the specified position from a nvram variable by delimiter.\n\n");
 	fprintf(stderr, "%s", help_msg);
 	exit(0);
 }
