@@ -71,7 +71,7 @@ struct varinit {
 
 #if __linux__
 #define _PATH_CONFIG						concat(safe_getenv("HOME"), "/tmp/conf")
-#define CONF_PATH							_PATH_CONFIG "/"
+#define CONF_PATH							concat(_PATH_CONFIG, "/")
 #elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(darwin)
 #define _PATH_CONFIG						concat(safe_getenv("HOME"), "/var/conf")
 #define CONF_PATH							concat(_PATH_CONFIG, "/")
