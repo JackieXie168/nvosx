@@ -610,13 +610,11 @@ int mkdir_r(const char *path)
 		if (*pos == '/') {
 			*pos = '\0';
 			mkdir(tmp, mode);
-			printf("for %s\n", tmp);
 			*pos = '/';
 		}
 	}
 	/* stop to create directories recursively if it's at last slash */
 	if (*(pos - 1) != '/') {
-		printf("if %s\n", tmp);
 		mkdir(tmp, mode);
 	}
 	StrFree(tmp);

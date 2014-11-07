@@ -971,9 +971,9 @@ nvram_commit()
 
 	//fp=fopen(DEVICE_PATH,"w+");
 #ifndef TARGET_DEVICE
-	printf ("\n\nNVRAM : Create configuration path : %s !!!\n", CONF_PATH);
+	//printf ("\n\nNVRAM : Create configuration path : %s !!!\n", CONF_PATH);
 	mkdir_r(CONF_PATH);
-	printf("\nnvram_commit() : commit=%d\n", get_nvram_log());
+	printf("nvram_commit() : commit=%d\n", get_nvram_log());
 	printf("Configuration is commited !\n");
 	if(get_nvram_log() >= 1){
 		nvram_accessfile();
