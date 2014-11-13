@@ -1,5 +1,8 @@
 Changelog
 
+	20141113
+		．fix that it cannot grep common string with grep issue.
+
 	20141107
 		．improve the file operations and security.
 		．improve the nvram actions behaviors.
