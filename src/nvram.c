@@ -462,7 +462,7 @@ nvram_free()
 		}else
 			sprintf(tmpbuf1, "Remain=%lu B", remain);
 		strcat(p,tmpbuf1);
-		p+=strlen(tmpbuf1);
+		//p+=strlen(tmpbuf1);
 			
 		printf("%s\n", tmpbuf2);
 	}
@@ -482,9 +482,11 @@ nvram_get(name)
 	hashvar(name,&offset);
 	vp=(struct varinit*)get_addr(*offset);
 	if ((v = findvar(vp, name))) {
-		INTON;
-		//printf("nvram_get found %s :: %s\n",name,(char *)get_addr(v->text_offset));
-		return (char *)get_addr(v->text_offset);
+		if (v->validated == 1) {
+			INTON;
+			//printf("nvram_get found %s :: %s\n",name,(char *)get_addr(v->text_offset));
+			return (char *)get_addr(v->text_offset);
+		}
 	}
 	//printf ("nvram_get found no var\n");
 	INTON;
@@ -717,7 +719,7 @@ nvram_unset(const char *s)
 	
 	if (varequal((char *)get_addr(vp->name_offset), s))
 	{
-		*ptr=vp->next_offset;
+		//*ptr=vp->next_offset;
 	}
 	else
 	{
@@ -729,7 +731,7 @@ nvram_unset(const char *s)
 
 		if (vp)
 		{
-			vpp->next_offset=vp->next_offset;
+			//vpp->next_offset=vp->next_offset;
 		}
 	}
 	if (vp) 
@@ -764,12 +766,12 @@ nvram_show()
 			//printf("vp->name_offset = %08x\n", vp->name_offset);
 			//printf("vp->text_offset = %08x\n", vp->text_offset);	
 					
-			//if (vp->validated == 1) {
+			if (vp->validated == 1) {
 				name=(char *)get_addr(vp->name_offset);
 				value=(char *)get_addr(vp->text_offset);
 				len = strlen(value);
 				printf("%s%s\n", name,value);
-			//}
+			}
 		}
 	}
 	INTON;
@@ -965,6 +967,7 @@ nvram_commit()
 	char *argv[]={ "commit",NULL,NULL,(char *)0};
 	//char *argv[]={ "ls","-al","/etc",(char *)0};
 	
+	INTOFF;
 	if (shm_flag)
 		attach_share_memory();
 
@@ -1010,37 +1013,40 @@ nvram_commit()
 	if (fp==NULL)
 	{
 		printf ("file open error\n");
+		INTON;
 		return -1;
 	}
 #endif
 
-	INTOFF;
-	
+	//INTOFF;
+
 	for ( i=0; i < VTABSIZE ; i++) {
 		vp = (struct varinit *)get_addr(var_start[i]);
 		for (; vp ; vp = (struct varinit *)get_addr(vp->next_offset)) {
 			char *name,*value;
-			name=(char *)get_addr(vp->name_offset);
+			if (vp->validated == 1) {
+				name=(char *)get_addr(vp->name_offset);
 #if defined(NVRAM_GOT_FROM_HW)
-				// To filter out HW related nvram vars
-				//printf("%s\n", name);
-				kk = 0;
-				while (nvram_by_pass_var[kk] != NULL) {
-					if( !strcmp(name, nvram_by_pass_var[kk]) ) {
-						by_pass=1;
-						break;
+					// To filter out HW related nvram vars
+					//printf("%s\n", name);
+					kk = 0;
+					while (nvram_by_pass_var[kk] != NULL) {
+						if( !strcmp(name, nvram_by_pass_var[kk]) ) {
+							by_pass=1;
+							break;
+						}
+						kk++;
 					}
-					kk++;
-				}
 
-				if(by_pass)	{
-					//printf("nvram_commit:: by_pass[%s]\n", name);
-					by_pass = 0;
-					continue;
-				}
+					if(by_pass)	{
+						//printf("nvram_commit:: by_pass[%s]\n", name);
+						by_pass = 0;
+						continue;
+					}
 #endif
-			value=(char *)get_addr(vp->text_offset);
-			fprintf(fp,"%s%s%s\n", sep, name, value);
+				value=(char *)get_addr(vp->text_offset);
+				fprintf(fp,"%s%s%s\n", sep, name, value);
+			}
 		}
 	}
 	INTON;
@@ -1066,18 +1072,24 @@ int nvram_getall(char *buf, int count)
 		vp = (struct varinit *)get_addr(var_start[i]);
 		for (; vp ; vp = (struct varinit *)get_addr(vp->next_offset)) {
 			char *name,*value;
-			name=(char *)get_addr(vp->name_offset);
-			value=(char *)get_addr(vp->text_offset);
-			line=malloc(strlen(name)+strlen(value)+1);
-			if (line==NULL)
-				goto END;
-			sprintf(line,"%s%s", name, value);
-			strcpy(buf,line);
-			buf += strlen(line);
-			*buf = '\0';
-			buf++;
-			len+=(strlen(line)+1);
-			free(line);
+			if (vp->validated == 1) {
+				name=(char *)get_addr(vp->name_offset);
+				if (strlen(name) == 0) {
+					printf("%s %d\n", __FUNCTION__, __LINE__);
+					continue;
+				}
+				value=(char *)get_addr(vp->text_offset);
+					line=malloc(strlen(name)+strlen(value)+2);
+				if (line==NULL)
+					goto END;
+				sprintf(line,"%s%s", name, value);
+				strcpy(buf,line);
+				buf += strlen(line);
+				*buf = '\0';
+				buf++;
+				len+=(strlen(line)+1);
+				free(line);
+			}
 		}
 	}
 END:
@@ -1363,8 +1375,9 @@ nvram_clean(void)
 #endif
 #else
 	/*erase MAGIC_ID, current pointer offset, and hash table*/
-	int len=(strlen(MAGIC_ID)+1)+8+(sizeof(struct varinit *)*VTABSIZE+1);
-	memset(ptr_start,0,len);
+	//int len=(strlen(MAGIC_ID)+1)+8+(sizeof(struct varinit *)*VTABSIZE+1);
+	//memset(ptr_start,0,len);
+	memset(pointer,0,SHARESIZE);
 #endif
 }
 
