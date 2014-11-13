@@ -10,7 +10,10 @@ if [ ! -e $cfg ]; then
 	./autogen.sh && make
 fi
 
-$cfg unset vendor_confile_qid
+./$cfg import ../conf/nvram.conf
+./$cfg import ../conf/timezone-2013.conf
+
+./$cfg unset vendor_confile_qid
 for((i=1;i<=66;i++)); do ./$cfg -s vendor_confile_qid -a $i -p $i -d "___"; done
 for((i=1;i<=66;i++)); do ./$cfg -s vendor_confile_qid -v $i -d "___"; done
 echo "" && echo "Adding tokens to a empty list ..."
