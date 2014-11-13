@@ -764,12 +764,12 @@ nvram_show()
 			//printf("vp->name_offset = %08x\n", vp->name_offset);
 			//printf("vp->text_offset = %08x\n", vp->text_offset);	
 					
-			if (vp->validated == 1) {
+			//if (vp->validated == 1) {
 				name=(char *)get_addr(vp->name_offset);
 				value=(char *)get_addr(vp->text_offset);
 				len = strlen(value);
 				printf("%s%s\n", name,value);
-			}
+			//}
 		}
 	}
 	INTON;
