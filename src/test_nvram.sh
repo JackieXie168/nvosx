@@ -10,7 +10,7 @@ if [ ! -e $cfg ]; then
 	./autogen.sh && make
 fi
 
-$cfg unset vendor_confile_qid
+./$cfg unset vendor_confile_qid
 for((i=1;i<=66;i++)); do ./$cfg -s vendor_confile_qid -a $i -p $i -d "___"; done
 for((i=1;i<=66;i++)); do ./$cfg -s vendor_confile_qid -v $i -d "___"; done
 echo "" && echo "Adding tokens to a empty list ..."
@@ -31,13 +31,13 @@ echo "" && echo "Change delimiter(s) ..."
 ./$cfg -s vendor_confile_qid -o "@_@" -d "-_-||"
 echo "" && echo "Remove tokens from the ending of list for one by one ..."
 for((i=1;i<=65;i++)); do ./$cfg -s vendor_confile_qid -r $(echo `expr 66 - $i`) -d "@_@"; done
-$cfg unset vendor_confile_qid
+./$cfg unset vendor_confile_qid
 echo "" && echo "Insert tokens from the beginning of the empty list with bigger number then change by the smallest number for one by one ..."
 for((i=1;i<=65;i++)); do ./$cfg -s vendor_confile_qid -a $(echo `expr 66 - $i`) -p $i -d ":::::"; ./$cfg -s vendor_confile_qid -m $i -p $i -d ":::::"; done
-$cfg unset vendor_confile_qid
+./$cfg unset vendor_confile_qid
 echo "" && echo "Test for changing delimiter(s) ..."
-$cfg set tmp_nvram="0 11 222 3333 44444 555555 6666666 77777777 888888888 9999999999 10101010101010101010"
-$cfg get tmp_nvram
+./$cfg set tmp_nvram="0 11 222 3333 44444 555555 6666666 77777777 888888888 9999999999 10101010101010101010"
+./$cfg get tmp_nvram
 ./$cfg -s tmp_nvram -o "*" -d " "
 ./$cfg -s tmp_nvram -o "&&" -d "*"
 ./$cfg -s tmp_nvram -o "---" -d "&&"
