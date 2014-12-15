@@ -1139,7 +1139,7 @@ char *index_str (char *str, const char *n, int index)
 	
 	index = abs(index);
 	if(index == 0 || index > matchStrPosAt(n, str, -1) + 1)
-		return return_null(NULL);
+		return NULL;
 	else if(index == 1){
 		idx1 = 0;
 		idx2 = matchStrPosAt(n, str, index) - delm_len - 1;
