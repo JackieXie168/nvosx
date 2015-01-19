@@ -490,7 +490,7 @@ nvram_get(name)
 	}
 	//printf ("nvram_get found no var\n");
 	INTON;
-	return return_null(NULL);
+	return NULL;
 }
 
 //extern char flag_reload_nvram;
