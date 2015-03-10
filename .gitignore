@@ -15,6 +15,8 @@
 *.dylib
 
 # Executables
+*.com
+*.class
 *.exe
 *.out
 *.app
@@ -24,6 +26,12 @@
 *.pyc
 
 # Others
-.DS_Store
+.DS_Store*
+.*~
+*~
 *.swp
+*.swo
 log/*.log
+Icon?
+Thumbs.db
+ehthumbs.db
