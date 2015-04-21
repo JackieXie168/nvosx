@@ -35,7 +35,7 @@ int *var_start;				/*start address of hash table*/
 //static inline void* ckmalloc (int sz)          { return xmalloc(sz);     }
 #if __linux__
 union semun {
-#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX)
+#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(__CYGWIN__)
 typedef union {
 #endif
 	int val;   /* Value for SETVAL */
@@ -43,13 +43,17 @@ typedef union {
 	unsigned short *array;  /* Array for GETALL, SETALL */
 #if __linux__
 };
-#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX)
+#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(__CYGWIN__)
 }semun;
 #endif
 
 inline void set_sem(int semid)
 {
+#if defined(__CYGWIN__)
+	semun sem_union;
+#else
 	union semun sem_union;
+#endif
 	sem_union.val=1;
 	if (semctl(semid,0,SETVAL,sem_union)==-1)
 		printf ("set sem error\n");
@@ -266,7 +270,11 @@ findvar(struct varinit *vp, const char *name)
 }
 
 static char tmpbuf[17];
+#if defined(__CYGWIN__) || defined(_MSC_VER) || defined(__MINGW32__)
+char* int2str (int n)
+#else
 char* itoa (int n)
+#endif
 {
   int i=0,j;
   char s[17];
@@ -364,7 +372,11 @@ int set_nvram_log(int status)
 	{
 		fseek(file_p,0,SEEK_END);
 		need_commit = status;
+#if defined(__CYGWIN__) || defined(_MSC_VER) || defined(__MINGW32__)
+		fputs(int2str(need_commit), file_p);
+#else
 		fputs(itoa(need_commit), file_p);
+#endif
 		//printf("\nset_commit(%d) : need_commit=%d\n", need_commit, need_commit);
 		fclose(file_p);
 		return 0;

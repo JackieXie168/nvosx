@@ -34,7 +34,7 @@
 
 #if __linux__
 #include <signal.h>
-#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX)
+#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(__CYGWIN__)
 #include <sys/signal.h>
 #define _NSIG NSIG 
 #endif
@@ -1648,8 +1648,10 @@ _eval(char *const argv[], char *path, int timeout, int *ppid)
 			signal(sig, SIG_DFL);
 
 		/* Clean up */
+#ifdef TIOCNOTTY
 		ioctl(0, TIOCNOTTY, 0);
 		close(STDIN_FILENO);
+#endif  /* ! TIOCNOTTY */
 		setsid();
 
 		/* Redirect stdout to <path> */
