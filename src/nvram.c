@@ -29,8 +29,6 @@ char flag_reload_nvram=0;
 int *var_start;				/*start address of hash table*/
 
 #define BOUNDARY_4X(x)	(x = (int)(x + 3) & 0xfffffffc)	/* X4 alignment */
-#define INIT_BUF_SIZE_LARGE 1638400
-#define INIT_BUF_SIZE_SMALL 2048
 
 //static inline void* ckmalloc (int sz)          { return xmalloc(sz);     }
 #if __linux__

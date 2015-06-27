@@ -21,7 +21,7 @@ extern const char	*__progname;
 
 extern void nvram_show(void);
 
-#define BUFSIZE 1024
+#define BUFSIZE INIT_BUF_SIZE_LARGE
 char config_file_path[1024];
 
 static void
@@ -44,12 +44,12 @@ usage(void)
 
 	sprintf(help_msg, "\t%s [-s | -x <nvram variable>] {[-a | -m <values> -p <position>] | [ -n <to get # of digits>] | [-i <position>] | [-v <value>] | [-e <value>] | [ -r <position>] | [ -o <new delimiter>]} [-d delimiter]\n\n", __progname);
 	strcat(help_msg, "\tparsing options.\n");
-	strcat(help_msg, "\t\t<nvram variable>：input a nvram variable.\n");
-	strcat(help_msg, "\t\tdelimiter：a delimiter which is a seperator.\n");
+	strcat(help_msg, "\t\t<nvram variable> : input a nvram variable.\n");
+	strcat(help_msg, "\t\tdelimiter : a delimiter which is a seperator.\n");
 	strcat(help_msg, "\t\t-s : to specify a nvram variable.\n");
 	strcat(help_msg, "\t\t-x : to get total counts of token by specified delimiter.\n");
 	strcat(help_msg, "\t\t-d : to specify a delimiter.\n");
-	strcat(help_msg, "\t\t-a：insert a value to the nvram variable by delimiter.\n");
+	strcat(help_msg, "\t\t-a : insert a value to the nvram variable by delimiter.\n");
 	strcat(help_msg, "\t\t-r : remove a value from a nvram variable by specfied position.\n");
 	strcat(help_msg, "\t\t-v : remove a value from a nvram variable by specfied value.\n");
 	strcat(help_msg, "\t\t-e : to check a value in a nvram variable is exist or not.\n");

@@ -49,6 +49,8 @@ struct nvram_tuple {
 };
 
 #define VTABSIZE 127
+#define INIT_BUF_SIZE_LARGE 1638400
+#define INIT_BUF_SIZE_SMALL 2048
 
 struct varinit {
 	int name_offset;		/*offset of name string : ex. wan_proto=*/

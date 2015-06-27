@@ -1,4 +1,9 @@
 Changelog
+	20150627
+		．extend nvram variable value's length.
+
+	20150421
+		．update for support cygwin
 
 	20141113
 		．fix that it cannot grep common string with grep issue.
