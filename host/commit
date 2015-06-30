@@ -1,0 +1,11 @@
+#!/bin/sh
+#Add by Jackie Xie
+
+export TARGET_ROOT_DIR=/tmp/
+
+if [ ! -d /tmp/ ]; then \
+   echo Create directory /tmp/ ; \
+   mkdir -p /tmp/ ; \
+fi
+
+invram show > /tmp/nvram.config

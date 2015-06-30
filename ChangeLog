@@ -1,0 +1,5 @@
+Initial version
+20120710 
+	remove non-nvram functions.
+	import invram to Mac OS X.
+	add a 'test' example to verify invram.

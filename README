@@ -1,0 +1,20 @@
+Small application for saving data on embedded system. It runs as multi-clients & server mode with socket-call.
+
+When you check this source code from GIT tree, please modify as bellowing
+for meeting with your specific project.
+
+1). Generate a patch to modify the macro definition in 'nvram_daemon.c' at about line 46:
+        #define NVRAM_MAGIC            "The Unique ID of the configuration file, such as your project started data: 0x20090330"
+        #define RAND_MAGIC					"The same value as NVRAM_MAGIC"
+        #define PATH_NVRAM_MTD		"Where the MTD flash in your DUT, such as '/dev/mtd/3'"
+
+
+2). Over-write the code file 'nvram_defaults.c':
+        Add your specific project name/value configuration pairs.
+
+
+3). Compiling the code：
+	$ ./autogen.sh && make
+
+
+It SHOULD be easily understandable. ^_^
