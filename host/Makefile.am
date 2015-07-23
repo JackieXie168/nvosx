@@ -1,4 +1,4 @@
-INSTALL_DIR = /usr/sbin
+INSTALL_DIR = ${prefix}/bin
 
 if NON_LINUX
 COMMIT_BIN = $(top_srcdir)/nvram/host/commit.macosx

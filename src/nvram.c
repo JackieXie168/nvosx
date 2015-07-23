@@ -755,13 +755,12 @@ exit:
 extern void
 nvram_show()
 {
- 
 	struct varinit *vp;
 	int i=0;
 
 	if (shm_flag)
 		attach_share_memory();
-	
+	//system("remove_shm.sh");
 	INTOFF;
 	//printf ("call nvram_show\n");
 	for ( i=0; i < VTABSIZE ; i++)
@@ -785,7 +784,6 @@ nvram_show()
 		}
 	}
 	INTON;
-
 }
 
 int
@@ -936,8 +934,10 @@ int nvram_backup(char *ofile)
 		fp = fopen("/tmp/commit", "r");
 		if (fp)
 			system("/tmp/commit");
-		else	
-			system("/usr/sbin/commit");
+		else	{
+			system(COMMIT_PROG);
+			//system("/usr/sbin/commit");
+		}
 	}
 	return 0;
 }
@@ -1380,7 +1380,33 @@ nvram_clean(void)
 	else
 		set_nvram_log(2);
 #else
-	system("remove_shm.sh");
+	struct varinit *vp;
+	int i=0;
+
+	if (shm_flag)
+		attach_share_memory();
+	
+	//INTOFF;
+	printf("Please wait a minute for cleaning all nvram variables... \n");
+	for ( i=0; i < VTABSIZE ; i++)
+	{
+		vp = (struct varinit *)get_addr(var_start[i]);
+		for ( ;vp ; vp = (struct varinit*)get_addr(vp->next_offset))
+		{
+			char *name, *nv;
+		
+			if (vp->validated == 1) {
+				name=(char *)get_addr(vp->name_offset);
+				nv = StrDup(name);
+				idxOfElement(nv, name, "=", 1);
+				printf("nvram unset %s\n", nv);
+				nvram_unset(nv);
+				StrFree(nv);
+			}
+		}
+	}
+	//INTON;
+	//system("remove_shm.sh");
 	//detach_shm();
 #endif
 #else

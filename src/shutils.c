@@ -1166,6 +1166,19 @@ char *index_str (char *str, const char *n, int index)
 	return str;
 }
 
+char *idxOfElement(char dst[], const char *src, const char *delimiter, int idx)
+{
+	char *tmp = StrDup(src);
+	char *sidx = index_str(tmp, delimiter, idx);
+	if(sidx != NULL){
+		strcpy(dst, sidx);
+	}
+	else
+		strcpy(dst, return_empty(NULL));
+	StrFree(tmp);
+	return dst;
+}
+
 char *insert_str(char *str, char *value, char *delm, int index)
 {
 	int i, idx, tokens;

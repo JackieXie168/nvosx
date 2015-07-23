@@ -90,6 +90,7 @@ char * ultoip(unsigned long ul);
 char *strcutail (char *str, const char *n, int pos);
 char *strmhead (char *str, const char *n, int pos);
 char *index_str (char *str, const char *n, int index);
+char *idxOfElement(char dst[], const char *src, const char *delimiter, int idx);
 char *insert_str(char *str, char *value, char *delm, int index);
 char *delete_str(char *name, char *delm, int index);
 char *delete_val(char *name, char *value, char *delm);

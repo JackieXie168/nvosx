@@ -106,6 +106,8 @@ struct varinit {
 #define _PATH_CONFIG_MTD			TMP_FILE_PATH
 #endif
 
+#define COMMIT_PROG			concat(safe_getenv("HOME"), "/bin/commit")
+
 #define ERR_NO_MEM -1
 
 //void *xmalloc(size_t sz);
