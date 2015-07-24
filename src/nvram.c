@@ -1335,8 +1335,12 @@ nvram_init()
 	return 0;
 }
 
-void
-nvram_clean(void)
+void nvram_clear(void)
+{
+	system("remove_shm.sh");
+}
+
+void nvram_clean(void)
 {
 #ifndef TARGET_DEVICE
 #if 0
@@ -1432,7 +1436,7 @@ void nvram_default(void)
 	INTOFF_REALLOC;
 	pointer=ptr_start;
 
-	nvram_clean();
+	nvram_clear();
 	/*start initial data*/
 	ptr=ckmalloc(strlen(MAGIC_ID));
 	strcpy(ptr,MAGIC_ID);
@@ -1519,7 +1523,7 @@ void re_alloc(void)
 	printf("%s, %d, pos=%x total_len=%d\n", __FUNCTION__, __LINE__, get_curr_pos(), total_len);
 	pointer=ptr_start;
 
-	nvram_clean();
+	nvram_clear();
 
 	/*start initial data*/
 	ptr=ckmalloc(strlen(MAGIC_ID));

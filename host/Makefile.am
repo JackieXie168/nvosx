@@ -6,7 +6,7 @@ else
 COMMIT_BIN = $(top_srcdir)/nvram/host/commit
 endif
 
-all: install-data-am
+all: install-data-am install-bin
 	@echo "Compile done";
 
 install-data-am:
