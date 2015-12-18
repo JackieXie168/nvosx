@@ -1,4 +1,4 @@
-INSTALL_DIR = /usr/sbin
+INSTALL_DIR = ${prefix}/bin
 
 if NON_LINUX
 COMMIT_BIN = $(top_srcdir)/nvram/host/commit.macosx
@@ -6,7 +6,7 @@ else
 COMMIT_BIN = $(top_srcdir)/nvram/host/commit
 endif
 
-all: install-data-am
+all: install-data-am install-bin
 	@echo "Compile done";
 
 install-data-am:

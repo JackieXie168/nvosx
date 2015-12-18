@@ -29,13 +29,11 @@ char flag_reload_nvram=0;
 int *var_start;				/*start address of hash table*/
 
 #define BOUNDARY_4X(x)	(x = (int)(x + 3) & 0xfffffffc)	/* X4 alignment */
-#define INIT_BUF_SIZE_LARGE 1638400
-#define INIT_BUF_SIZE_SMALL 2048
 
 //static inline void* ckmalloc (int sz)          { return xmalloc(sz);     }
 #if __linux__
 union semun {
-#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX)
+#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(__CYGWIN__)
 typedef union {
 #endif
 	int val;   /* Value for SETVAL */
@@ -43,13 +41,17 @@ typedef union {
 	unsigned short *array;  /* Array for GETALL, SETALL */
 #if __linux__
 };
-#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX)
+#elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(__CYGWIN__)
 }semun;
 #endif
 
 inline void set_sem(int semid)
 {
+#if defined(__CYGWIN__)
+	semun sem_union;
+#else
 	union semun sem_union;
+#endif
 	sem_union.val=1;
 	if (semctl(semid,0,SETVAL,sem_union)==-1)
 		printf ("set sem error\n");
@@ -266,7 +268,11 @@ findvar(struct varinit *vp, const char *name)
 }
 
 static char tmpbuf[17];
+#if defined(__CYGWIN__) || defined(_MSC_VER) || defined(__MINGW32__)
+char* int2str (int n)
+#else
 char* itoa (int n)
+#endif
 {
   int i=0,j;
   char s[17];
@@ -364,7 +370,11 @@ int set_nvram_log(int status)
 	{
 		fseek(file_p,0,SEEK_END);
 		need_commit = status;
+#if defined(__CYGWIN__) || defined(_MSC_VER) || defined(__MINGW32__)
+		fputs(int2str(need_commit), file_p);
+#else
 		fputs(itoa(need_commit), file_p);
+#endif
 		//printf("\nset_commit(%d) : need_commit=%d\n", need_commit, need_commit);
 		fclose(file_p);
 		return 0;
@@ -745,13 +755,12 @@ exit:
 extern void
 nvram_show()
 {
- 
 	struct varinit *vp;
 	int i=0;
 
 	if (shm_flag)
 		attach_share_memory();
-	
+	//system("remove_shm.sh");
 	INTOFF;
 	//printf ("call nvram_show\n");
 	for ( i=0; i < VTABSIZE ; i++)
@@ -775,7 +784,6 @@ nvram_show()
 		}
 	}
 	INTON;
-
 }
 
 int
@@ -926,8 +934,10 @@ int nvram_backup(char *ofile)
 		fp = fopen("/tmp/commit", "r");
 		if (fp)
 			system("/tmp/commit");
-		else	
-			system("/usr/sbin/commit");
+		else	{
+			system(COMMIT_PROG);
+			//system("/usr/sbin/commit");
+		}
 	}
 	return 0;
 }
@@ -1325,8 +1335,12 @@ nvram_init()
 	return 0;
 }
 
-void
-nvram_clean(void)
+void nvram_clear(void)
+{
+	system("remove_shm.sh");
+}
+
+void nvram_clean(void)
 {
 #ifndef TARGET_DEVICE
 #if 0
@@ -1370,7 +1384,33 @@ nvram_clean(void)
 	else
 		set_nvram_log(2);
 #else
-	system("remove_shm.sh");
+	struct varinit *vp;
+	int i=0;
+
+	if (shm_flag)
+		attach_share_memory();
+	
+	//INTOFF;
+	printf("Please wait a minute for cleaning all nvram variables... \n");
+	for ( i=0; i < VTABSIZE ; i++)
+	{
+		vp = (struct varinit *)get_addr(var_start[i]);
+		for ( ;vp ; vp = (struct varinit*)get_addr(vp->next_offset))
+		{
+			char *name, *nv;
+		
+			if (vp->validated == 1) {
+				name=(char *)get_addr(vp->name_offset);
+				nv = StrDup(name);
+				idxOfElement(nv, name, "=", 1);
+				printf("nvram unset %s\n", nv);
+				nvram_unset(nv);
+				StrFree(nv);
+			}
+		}
+	}
+	//INTON;
+	//system("remove_shm.sh");
 	//detach_shm();
 #endif
 #else
@@ -1396,7 +1436,7 @@ void nvram_default(void)
 	INTOFF_REALLOC;
 	pointer=ptr_start;
 
-	nvram_clean();
+	nvram_clear();
 	/*start initial data*/
 	ptr=ckmalloc(strlen(MAGIC_ID));
 	strcpy(ptr,MAGIC_ID);
@@ -1483,7 +1523,7 @@ void re_alloc(void)
 	printf("%s, %d, pos=%x total_len=%d\n", __FUNCTION__, __LINE__, get_curr_pos(), total_len);
 	pointer=ptr_start;
 
-	nvram_clean();
+	nvram_clear();
 
 	/*start initial data*/
 	ptr=ckmalloc(strlen(MAGIC_ID));

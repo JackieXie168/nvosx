@@ -11,8 +11,8 @@
  *
  */
 
-#ifndef _nvram.h_
-#define _nvram.h_
+#ifndef _nvram_h_
+#define _nvram_h_
 
 #ifndef _LANGUAGE_ASSEMBLY
 #include <errno.h>
@@ -49,6 +49,8 @@ struct nvram_tuple {
 };
 
 #define VTABSIZE 127
+#define INIT_BUF_SIZE_LARGE 1638400
+#define INIT_BUF_SIZE_SMALL 2048
 
 struct varinit {
 	int name_offset;		/*offset of name string : ex. wan_proto=*/
@@ -69,7 +71,7 @@ struct varinit {
 #define SHARESIZE 65536*30
 #define MAGIC_ID "<NVRAM>"
 
-#if __linux__
+#if __linux__ || defined(__CYGWIN__)
 #define _PATH_CONFIG						concat(safe_getenv("HOME"), "/tmp/conf")
 #define CONF_PATH							concat(_PATH_CONFIG, "/")
 #elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(darwin)
@@ -77,9 +79,11 @@ struct varinit {
 #define CONF_PATH							concat(_PATH_CONFIG, "/")
 //#define SO_NO_CHECK     				0xb
 #define SO_NO_CHECK     				0x100a
-#elif defined(__CYGWIN__) || defined(_MSC_VER) || defined(__MINGW32__)
+#elif defined(_MSC_VER) || defined(__MINGW32__)
 #define _PATH_CONFIG						concat(safe_getenv("HOMEDRIVE"), safe_getenv("HOMEPATH"), "\\temp")
 #define CONF_PATH							concat(_PATH_CONFIG, "\\")
+#include <inttypes.h>
+#define inline
 #endif
 
 #ifdef TARGET_DEVICE
@@ -101,6 +105,8 @@ struct varinit {
 #define TMP_FILE_PATH 					DEFAULT_FILE_PATH
 #define _PATH_CONFIG_MTD			TMP_FILE_PATH
 #endif
+
+#define COMMIT_PROG			concat(safe_getenv("HOME"), "/bin/commit")
 
 #define ERR_NO_MEM -1
 
