@@ -1,13 +1,15 @@
 INSTALL_DIR = ${prefix}/bin
 
 if NON_LINUX
-COMMIT_BIN = $(top_srcdir)/nvram/host/commit.macosx
+COMMIT_BIN = $(top_srcdir)/host/commit.macosx
 else
-COMMIT_BIN = $(top_srcdir)/nvram/host/commit
+COMMIT_BIN = $(top_srcdir)/host/commit
 endif
 
-all: install-data-am install-bin
+all:
 	@echo "Compile done";
+
+install: install-data-am install-bin
 
 install-data-am:
 	@echo "Run 'make install-bin' if you want to install commit program";

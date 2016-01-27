@@ -88,25 +88,25 @@ struct varinit {
 
 #ifdef TARGET_DEVICE
 #define _PATH_CONFIG						"/tmp"
-#define _PATH_CONFIG_MTD			"/dev/mtd/5"
-#define TMP_FILE_PATH 					"/flash/nvram.config"
-#define DEFAULT_FILE_PATH 		"/etc/nvram/nvram.config"
-#define DEFAULT_FILE_PATH_EU	"/etc/nvram_eu/nvram.config"
-#define REGION_FILE_PATH 			"/tmp/firmware_region"
+#define _PATH_CONFIG_MTD					"/dev/mtd/5"
+#define TMP_FILE_PATH 						"/flash/nvram.config"
+#define DEFAULT_FILE_PATH 					"/etc/nvram/nvram.config"
+#define DEFAULT_FILE_PATH_EU				"/etc/nvram_eu/nvram.config"
+#define REGION_FILE_PATH 					"/tmp/firmware_region"
 //#define TMP_FILE_PATH "/tmp/config/nvram.config"
 //##define TMP_FILE_PATH "/var/run/rc.conf"
 #else
-#define LOG_FILE_PATH 					concat(CONF_PATH, "nvram.log")
-#define BACKUP_FILE_PATH 			concat(CONF_PATH, "nvram.bak")
-#define DEFAULT_FILE_PATH 		concat(CONF_PATH, "nvram.conf")
-#define DEFAULT_FILE_PATH_EU 	concat(CONF_PATH, "nvram_eu.conf")
-#define REGION_FILE_PATH 			concat(CONF_PATH, "firmware_region")
+#define LOG_FILE_PATH 						concat(CONF_PATH, "nvram.log")
+#define BACKUP_FILE_PATH 					concat(CONF_PATH, "nvram.bak")
+#define DEFAULT_FILE_PATH 					concat(CONF_PATH, "nvram.default")
+#define DEFAULT_FILE_PATH_EU 				concat(CONF_PATH, "nvram_eu.conf")
+#define REGION_FILE_PATH 					concat(CONF_PATH, "firmware_region")
 #define ACTION_FILE     					concat(CONF_PATH, "action")
-#define TMP_FILE_PATH 					DEFAULT_FILE_PATH
-#define _PATH_CONFIG_MTD			TMP_FILE_PATH
+#define TMP_FILE_PATH 						concat(CONF_PATH, "nvram.conf")
+#define _PATH_CONFIG_MTD					TMP_FILE_PATH
 #endif
 
-#define COMMIT_PROG			concat(safe_getenv("HOME"), "/bin/commit")
+#define COMMIT_PROG						concat(safe_getenv("HOME"), "/bin/commit")
 
 #define ERR_NO_MEM -1
 
