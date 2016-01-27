@@ -1,33 +1,62 @@
-CLI_FILENAME = nvram
+ifndef TOPDIR
+TOPDIR=$(CURDIR)/
+endif
+ifndef top_srcdir
+top_srcdir=$(CURDIR)
+endif
+ifndef top_builddir
+top_builddir=$(CURDIR)
+endif
 
-LIB_VERMAJOR = 0
-LIB_VERMINOR = 1
-LIB_FILENAME = libnvram.so
+# Marker by Wayne on 2009/09/11, 
+# It's not necessary to include rules.mk in this level.
+#include $(TOPDIR)/rules.mk
 
-LIB_CFLAGS  = $(CFLAGS) -shared -fPIC
-LIB_LDFLAGS = $(LDFLAGS) -Wl,-soname,$(LIB_FILENAME).$(LIB_VERMAJOR).$(LIB_VERMINOR)
+#include $(top_builddir)/Rules.mak
 
-CLI_CFLAGS  = $(CFLAGS)
-CLI_LDFLAGS = $(LDFLAGS)
+SRCOBJ =  nvram_cavium.o shutils.o devutils.o
+SOURCES_PGM = nvram_main.o
 
-CLI_OBJ = cli.o
-LIB_OBJ = crc.o nvram.o
 
-all: cli libnvram
+EXTRA_CFLAGS+=-I$(LINUX_DIR)/include -Iinclude
 
-cli: libnvram
-	$(CC) $(CLI_CFLAGS) -c -o cli.o cli.c
-	$(CC) -o $(CLI_FILENAME) $(CLI_LDFLAGS) $(CLI_OBJ) \
-		$(LIB_FILENAME).$(LIB_VERMAJOR).$(LIB_VERMINOR)
+CFLAGS += $(EXTRA_CFLAGS) -fPIC
+#LDFLAGS += -lgcc_s -L/opt/Lantiq/work/toolchain-lantiq/toolchain-mips_r2_gcc-4.3.3+cs_uClibc-0.9.30.1_2_6_20/lib
+SBINPGM = nvram
+DNILIB = libnvram.so
 
-cli.o: cli.c
-	$(CC) $(CLI_CFLAGS) -c -o $@ $<
 
-libnvram:
-	$(CC) $(LIB_CFLAGS) -c -o crc.o crc.c
-	$(CC) $(LIB_CFLAGS) -c -o nvram.o nvram.c
-	$(CC) $(LIB_CFLAGS) $(LIB_LDFLAGS) \
-		-o $(LIB_FILENAME).$(LIB_VERMAJOR).$(LIB_VERMINOR) $(LIB_OBJ)
+all: $(SBINPGM) $(DNILIB)
+
+%.o: %.c
+	#$(call make-depend,$<,$@,$(subst .o,.d,$@))
+	$(CC) $(CFLAGS) $(LDFLAGS) $(EXTRA_CFLAGS) -fPIC  -I. -Iinclude -c -o $@ $<
+	
+$(DNILIB): $(SRCOBJ)
+	$(LD) $(LDFLAGS) -shared -o $@ $^ $(LIBS)
+
+$(SBINPGM): $(SOURCES_PGM) $(SRCOBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SOURCES_PGM) $(SRCOBJ) $(LIBS)
+	
 
 clean:
-	rm -f $(CLI_FILENAME) $(LIB_FILENAME)* *.o
+	rm -f *.o *.a *.so nvram
+
+#ifneq "all" "clean"
+#  -include .depend
+#endif
+
+
+#define make-depend
+#	$(CC)	-MM	\
+#		-MF $3	\
+#		-MP	\
+#		-MT $2	\
+#		-E	\
+#		$(CFLAGS)	\
+#		$1
+#	@cat $3 | while read line;do echo $$line >> .depend;done;(sort .depend | uniq) > tmp ; mv tmp .depend;rm -f $3
+#endef
+
+
+

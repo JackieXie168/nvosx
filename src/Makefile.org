@@ -1,0 +1,61 @@
+#################################################
+#	DNI NVRAM Setting Environment 		#
+#Note: Move from dni cavium project		#
+#Usage: Atheros Linux AP30 Project		#
+#################################################
+ 
+CC =  mips-linux-gcc
+AR = mips-linux-ar
+LD = mips-linux-ld
+LDFLAGS += -L.
+#CFLAGS	+= -s -O2
+
+SBINPGM = nvram
+
+DNILIB = libdniutil.a
+#DNILIB = libdniutil.so
+
+#SRCOBJ = shutils.o nvparse.o nvram_cavium.o listen.o
+SRCOBJ =  nvram_cavium.o
+SOURCES_PGM= nvram_main.o
+
+CFLAGS += -I. -I include 
+
+EXTRA_LIB = -L../dniutil -ldniutil
+
+#ifeq ($(STANDARD_PRODUCT_ONLY),y)
+#CFLAGS += -DSTANDARD_PRODUCT_ONLY
+#else
+#CFLAGS += -DBELKIN_ROUTER
+#endif
+
+# Uncommnet the following line if you want to test WAN PHY.
+#PHYTEST = phytest
+
+#all: $(DNILIB) $(SBINPGM) $(PHYTEST) $(CHECKWAN)
+all: $(DNILIB) $(SBINPGM)
+
+$(DNILIB): $(SRCOBJ)
+	$(AR) csr $(DNILIB) $(SRCOBJ)
+
+$(SBINPGM): $(SOURCES_PGM) $(SRCOBJ)
+	$(CC) $(LDFLAGS) -o $@ ${SOURCES_PGM} $(SRCOBJ)
+#	$(CC) $(LDFLAGS) -o $@ ${SOURCES_PGM} ${EXTRA_LIB}
+
+#ifneq ($(PHYTEST),)
+#$(PHYTEST): $(PHYTEST).o $(DNILIB)
+#	$(CC) $(LDFLAGS) -o $@ $^ ${EXTRA_LIB}
+#endif	
+
+#$(CHECKWAN): $(CHECKWAN).o $(DNILIB)
+#	$(CC) $(LDFLAGS) -o $@ $^ ${EXTRA_LIB}
+	
+clean:
+	rm -f *.o *.a *.so nvram
+
+#install:
+#	$(CP) nvram $(DESTSBIN)
+#ifneq ($(PHYTEST),)
+#	$(CP) $(PHYTEST) $(DESTBIN)
+#endif	
+#	$(CP) CheckWan $(DESTSBIN)

@@ -1,0 +1,133 @@
+TARGET = dni_netdev
+
+#modified for host  for hostby Jackie Xie
+ifeq ($(strip $(TARGET)),dni_netdev)
+include ../../Makefile.inc
+
+INSTALL_ROOT=$(TOPDIR)/$(TARGET_ROOT_DIR)
+BINDIR = $(TOPDIR)/$(TARGET_ROOT_DIR)/usr/sbin
+LIBDIR = $(TOPDIR)/$(TARGET_ROOT_DIR)/usr/lib
+TOOLPREFIX=/opt/toolchain_mips/bin/mips-linux-
+
+EXTRADEFS = -DDX_K34VWG_R
+
+else
+TOPDIR =
+TARGET_CONFIG_DIR =
+TARGET_ROOT_DIR =
+INSTALL_ROOT = /usr/local
+BINDIR = /usr/local/sbin
+LIBDIR = /usr/local/lib
+endif
+
+CROSS:=$(TOOLPREFIX)
+
+CC = $(CROSS)gcc
+AR = $(CROSS)ar
+LD = $(CROSS)ld
+STRIP = $(CROSS)strip
+
+CFLAGS	+= -I. -I include -Wall
+CFLAGS	+= -s -O2
+LDFLAGS += -L.
+
+SRCOBJ =  nvram_cavium.o shutils.o devutils.o
+SOURCES_PGM = nvram_main.o
+TESTOBJ	= test.o
+
+SBINPGM = nvram
+
+
+#DNILIB = libdniutil.a
+DNILIB = libdniutil.so
+
+##Added for IKANOS VDSL PROJECT
+#APPS_DIR = $(TOP_DIR)/user
+#IKANOS_CPE_PROJECT_DIR=$(APPS_DIR)/ikanos-cpe5
+#LIBS += -L$(IKANOS_CPE_PROJECT_DIR)/dni_lib -ldnivdsl
+#CFLAGS += -I$(IKANOS_CPE_PROJECT_DIR)/dni_lib
+
+#all: libnvram.so nvram
+all: $(SBINPGM) $(DNILIB)
+
+test: $(SRCOBJ) $(TESTOBJ)
+	$(CC) $(CFLAGS) -o $@ $(TESTOBJ)  $(LDFLAGS) -ldniutil $(LIBS)
+
+$(DNILIB): $(SRCOBJ)
+#	$(AR) csr $(DNILIB) $(SRCOBJ)
+	$(LD) -shared -o $@ $^ $(LIBS)
+	
+$(SBINPGM): $(SOURCES_PGM) $(SRCOBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SOURCES_PGM) $(SRCOBJ) $(LIBS)
+#	$(CC) $(LDFLAGS) -o $@ ${SOURCES_PGM} $(SRCOBJ)
+	
+install:
+	if test ! -d $(TOPDIR)/$(TARGET_ROOT_DIR)/usr/lib; then \
+		mkdir -p $(LIBDIR); \
+	fi; \
+	$(STRIP) libdniutil.so
+	cp libdniutil.so $(LIBDIR)
+	mkdir -p $(BINDIR)
+	install -c nvram $(BINDIR)	
+	$(STRIP) $(BINDIR)/nvram	
+	#cp -f nvram.default $(TARGET_CONFIG_DIR)/etc
+	mkdir -p $(TARGET_CONFIG_DIR)/etc/nvram	
+	#cp -f nvram.conf $(TARGET_CONFIG_DIR)/etc/nvram/nvram.config
+	cp -f nvram.default $(TARGET_CONFIG_DIR)/etc/nvram/nvram.config
+#modified for host by Jackie Xie
+ifeq ($(strip $(TARGET)),dni_netdev)
+	cp -f commit $(TARGET_CONFIG_DIR)/etc/nvram
+else
+ifeq ($(strip $(TARGET)),host)
+	cp -f ./host/commit $(TARGET_CONFIG_DIR)/etc/nvram
+endif
+endif
+
+romfs:
+	if test ! -d $(TOPDIR)/$(TARGET_ROOT_DIR)/usr/lib; then \
+		mkdir -p $(LIBDIR); \
+	fi; \
+	$(STRIP) libdniutil.so
+	cp libdniutil.so $(LIBDIR)
+	mkdir -p $(BINDIR)
+	install -c nvram $(BINDIR)	
+	$(STRIP) $(BINDIR)/nvram	
+	#cp -f nvram.default $(TARGET_CONFIG_DIR)/etc
+	mkdir -p $(TARGET_CONFIG_DIR)/etc/nvram	
+	#cp -f nvram.conf $(TARGET_CONFIG_DIR)/etc/nvram/nvram.config
+	cp -f nvram.default $(TARGET_CONFIG_DIR)/etc/nvram/nvram.config
+	cp -f commit $(TARGET_CONFIG_DIR)/etc/nvram
+	
+clean:
+	rm -f *.o *.a *.so nvram test
+
+#Make-dependency is done --- jackie
+CFLAGS += $(INCLUDES)
+
+
+ifneq "all" "clean"
+  -include .depend
+endif
+
+
+define make-depend
+	$(CC)	-MM	\
+		-MF $3	\
+		-MP	\
+		-MT $2	\
+		-E	\
+		$(CFLAGS)	\
+		$1
+	@cat $3 | while read line;do echo $$line >> .depend;done;(sort .depend | uniq) > tmp ; mv tmp .depend;rm -f $3
+endef
+
+%.o: %.c
+	$(call make-depend,$<,$@,$(subst .o,.d,$@))
+ifeq ($(strip $(TARGET)),dni_netdev)
+	$(CC) $(CFLAGS) $(INCLUDE) $(EXTRADEFS) -c -o $@ $<
+else
+	$(CC) $(CFLAGS) $(INCLUDE) -c -o $@ $<
+endif
+
+
+#Make-dependency is done !!!
