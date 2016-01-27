@@ -50,6 +50,7 @@ define Build/Compile
 endef
 
 define Build/Clean
+	cd $(shell pwd)/src; rm -rf .prepared* .configured* .built* ipkg* .version*
 	rm -rf $(PKG_INSTALL_DIR)
 	rm -rf $(PKG_BUILD_DIR)
 endef
@@ -69,17 +70,7 @@ endef
 define Package/dniutil/install
 	install -d -m0755 $(1)/etc/nvram
 	#$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD).default $(1)/etc/nvram/nvram.config
-ifeq ($(CONFIG_WEX_G300),y)
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-WEX-G300.default $(1)/etc/nvram/nvram.config
-else
-ifeq ($(CONFIG_FIRMWARE_REGION_EA),y)
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-WSR-300HP-EA.default $(1)/etc/nvram/nvram.config
-else
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-WSR-300HP.default $(1)/etc/nvram/nvram.config
-endif
-endif
-	#install -d -m0755 $(1)/etc/nvram_eu
-	#$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)_eu.default $(1)/etc/nvram_eu/nvram.config
+	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-DAP-1760.default $(1)/etc/nvram/nvram.config
 	install -d -m0755 $(1)/usr/lib
 	install -d -m0755 $(1)/lib
 #	$(CP) $(PKG_BUILD_DIR)/libnvram.so $(1)/usr/lib/

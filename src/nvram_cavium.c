@@ -296,6 +296,8 @@ nvram_set(name, val)
 	char *action_ptr;
 	char tmp_act[128], *act;
 
+	if (val == NULL) return -1;
+
 	if (shm_flag)
 		attach_share_memory();
 
