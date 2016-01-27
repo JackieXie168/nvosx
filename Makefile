@@ -81,23 +81,17 @@ ifeq ("$(MODELNAME)", "2_6_MVBR1000v4")
 	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-MVBR1000v4.default $(1)/etc/nvram/nvram.config
 endif
 ifeq ("$(MODELNAME)", "2_6_VEVG3000")
-ifeq ($(CONFIG_SFB),y)
-		$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-EVG3000.default $(1)/etc/nvram/nvram.config
-else
-		$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-VEVG3000.default $(1)/etc/nvram/nvram.config
-ifeq ($(CONFIG_ANNEXB),y)
-			echo "annex=B" >> $(1)/etc/nvram/nvram.config
-			echo "max_dsl_line=1" >> $(1)/etc/nvram/nvram.config
-else
-			echo "annex=A" >> $(1)/etc/nvram/nvram.config
-endif
-endif
+	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-VEVG3000.default $(1)/etc/nvram/nvram.config
 endif
 ifeq ("$(MODELNAME)", "2_6_D6300")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6300-GRX388.default $(1)/etc/nvram/nvram.config
+	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6300-VRX389.default $(1)/etc/nvram/nvram.config
 endif
 ifeq ("$(MODELNAME)", "2_6_D6400")
+  ifeq ($(strip $(CONFIG_LANTIQ_UBOOT_grx390)),y)
+	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6400-VRX389.default $(1)/etc/nvram/nvram.config
+  else
 	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6400-VRX388.default $(1)/etc/nvram/nvram.config
+  endif
 endif
 ifeq ("$(MODELNAME)", "2_6_D6100")
 	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6100-GRX388.default $(1)/etc/nvram/nvram.config
