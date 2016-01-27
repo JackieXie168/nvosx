@@ -6,6 +6,7 @@
 #
 # $Id: Makefile 4841 2006-09-23 19:28:18Z nico $
 
+-include $(TOPDIR)/.config
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dniutil
@@ -38,7 +39,7 @@ define Build/Compile
 	mkdir -p $(PKG_INSTALL_DIR)
 	$(MAKE) -C $(PKG_BUILD_DIR) \
 		$(TARGET_CONFIGURE_OPTS) \
-		CFLAGS="$(TARGET_CFLAGS) -I. -Iinclude"
+		CFLAGS="$(TARGET_CFLAGS) -I. -Iinclude -fPIC"
 # Marked by Wayne on 2009/09/11
 # There is no install-dniutil target.		
 #	$(MAKE) -C $(PKG_BUILD_DIR) \
@@ -67,37 +68,11 @@ endef
 
 define Package/dniutil/install
 	install -d -m0755 $(1)/etc/nvram
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD).default $(1)/etc/nvram/nvram.config
-ifeq ("$(MODELNAME)", "2_6_LANTIQ")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD).default $(1)/etc/nvram/nvram.config
-endif
-ifeq ("$(MODELNAME)", "2_6_VEGN2500")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-VEGN-VRX288.default $(1)/etc/nvram/nvram.config
-endif
-ifeq ("$(MODELNAME)", "2_6_VEGN2200")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-VEGN-VRX268.default $(1)/etc/nvram/nvram.config
-endif
-ifeq ("$(MODELNAME)", "2_6_MVBR1000v4")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-MVBR1000v4.default $(1)/etc/nvram/nvram.config
-endif
-ifeq ("$(MODELNAME)", "2_6_VEVG3000")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-VEVG3000.default $(1)/etc/nvram/nvram.config
-endif
-ifeq ("$(MODELNAME)", "2_6_D6300")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6300-VRX389.default $(1)/etc/nvram/nvram.config
-endif
-ifeq ("$(MODELNAME)", "2_6_D6400")
-  ifeq ($(strip $(CONFIG_LANTIQ_UBOOT_grx390)),y)
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6400-VRX389.default $(1)/etc/nvram/nvram.config
-  else
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6400-VRX388.default $(1)/etc/nvram/nvram.config
-  endif
-endif
-ifeq ("$(MODELNAME)", "2_6_D6100")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6100-GRX388.default $(1)/etc/nvram/nvram.config
-endif
-ifeq ("$(MODELNAME)", "2_6_D6200")
-	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-D6200-GRX388.default $(1)/etc/nvram/nvram.config
+	#$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD).default $(1)/etc/nvram/nvram.config
+ifeq ($(CONFIG_FIRMWARE_REGION_EA),y)
+	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-WSR-300HP-EA.default $(1)/etc/nvram/nvram.config
+else
+	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-WSR-300HP.default $(1)/etc/nvram/nvram.config
 endif
 	#install -d -m0755 $(1)/etc/nvram_eu
 	#$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)_eu.default $(1)/etc/nvram_eu/nvram.config

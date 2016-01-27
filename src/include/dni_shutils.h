@@ -164,7 +164,7 @@ int ifConfigGet
 	);
 
 /* Check for a blank character; that is, a space or a tab */
-#define isblank(c) ((c) == ' ' || (c) == '\t')
+//#define isblank(c) ((c) == ' ' || (c) == '\t')
 
 /* Strip trailing CR/NL from string <s> */
 #define chomp(s) ({ \

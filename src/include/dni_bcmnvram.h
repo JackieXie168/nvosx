@@ -59,12 +59,14 @@ struct varinit {
 /*share memory identifier (note. must greater than share memory size)*/
 #define NVRAMKEY 655350
 /*share memory size*/
+//#define SHARESIZE 65536*2
 #define SHARESIZE 65536*3
 #define MAGIC_ID "<NVRAM>"
 
 #define TMP_FILE_PATH "/tmp/configs/nvram.config"
 #define DEFAULT_FILE_PATH "/etc/nvram/nvram.config"
-#define DEFAULT_FILE_PATH_EU "/etc/nvram_eu/nvram.config"
+#define DEFAULT_FILE_PATH_EU "/etc/nvram/nvram.config"
+//#define DEFAULT_FILE_PATH_EU "/etc/nvram_eu/nvram.config"
 #define REGION_FILE_PATH "/tmp/firmware_region"
 
 #define ERR_NO_MEM -1
@@ -81,7 +83,6 @@ void detach_shm(void);
 extern int nvram_invmatch(char *name, char *match);
 extern int nvram_match(char *name, char *match);
 extern int nvram_commit(void);
-extern char *nvram_free();
 extern char *nvram_get(const char *name);
 extern int nvram_set(const char *name, const char *val);
 extern int nvram_unset(const char *s);

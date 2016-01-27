@@ -240,52 +240,7 @@ findvar(struct varinit *vp, const char *name)
 	return vp;
 }
 
-char *
-nvram_free()
-{
-	char *ptr=NULL, *p=NULL;
-	unsigned long total, remain, used;
-	char tmpbuf1[64]={'\0'};
-	char tmpbuf2[128]={'\0'};
-
-	if (shm_flag)
-		attach_share_memory();
-	ptr=(char *)get_curr_pos();
-
-	/*if out of share memory then re-allocate share memory*/
-	if(!ptr_start || !ptr){
-		printf ("memory doesn't get...\n");
-	}else if (ptr>=(ptr_start+SHARESIZE)) {
-		printf ("out of memory...realloc memory....\n");
-	}else{
-		total = SHARESIZE;
-		used = (unsigned long)(ptr - (char *)ptr_start);
-		remain = SHARESIZE - used;
-
-		p = tmpbuf2;
-		if(total/1000){
-			sprintf(tmpbuf1, "Total=%lu.%03d KB, ", total/1000, total%1000);
-		}else
-			sprintf(tmpbuf1, "Total=%lu B, ", total);
-		strcat(p,tmpbuf1);
-		p+=strlen(tmpbuf1);
-		if(used>1000){
-			sprintf(tmpbuf1, "Used=%lu.%03d KB, ", used/1000, used%1000);
-		}else
-			sprintf(tmpbuf1, "Used=%lu B, ", used);
-		strcat(p,tmpbuf1);
-		p+=strlen(tmpbuf1);
-		if(remain>1000){
-			sprintf(tmpbuf1, "Remain=%lu.%03d KB", remain/1000, remain%1000);
-		}else
-			sprintf(tmpbuf1, "Remain=%lu B", remain);
-		strcat(p,tmpbuf1);
-
-		printf("%s\n", tmpbuf2);
-	}
-
-	return NULL;
-}
+char pointer_buf[50];
 
 char *
 nvram_get(name_org)
@@ -298,7 +253,14 @@ nvram_get(name_org)
 	if (shm_flag)
 		attach_share_memory();
 	INTOFF;
-	if (strcmp(name_org, "_action_") == 0) {		/* action queue */
+	if (strcmp(name_org, "__pointer__") == 0) {		/* to check share memory used offset */
+		char *off;
+		off=get_curr_pos();
+		off=(int)((int)off-(int)ptr_start);
+		sprintf(pointer_buf, "offset=%d size=%d", off, SHARESIZE);
+		return (char *)pointer_buf;
+	}
+	else if (strcmp(name_org, "_action_") == 0) {		/* action queue */
 		name = "action";
 	}
 	else
@@ -332,6 +294,7 @@ nvram_set(name, val)
 	int name_offset,value_offset;
 	struct varinit *vp, *vpp;
 	char *action_ptr;
+	char tmp_act[128], *act;
 
 	if (shm_flag)
 		attach_share_memory();
@@ -349,6 +312,15 @@ nvram_set(name, val)
 
 		action_ptr=nvram_get("action");
 		if (action_ptr) {
+			if (strcmp(val, "3") == 0) {		/* Only keep action=3 one time */
+				strcpy(tmp_act, action_ptr);
+				ptr=tmp_act;
+				do {
+					act=strsep(&ptr, " ");
+					if ((act != NULL) && (strcmp(act, "3") == 0))
+						return 0;
+				} while (ptr);
+			}	
 			len += strlen(action_ptr);
 			len += 2;
 		}
@@ -565,6 +537,7 @@ exit:
 	return (0);
 }
 
+
 extern void
 nvram_show()
 {
@@ -600,7 +573,68 @@ nvram_show()
 	INTON;
 
 }
-#define _PATH_CONFIG_MTD  "/dev/mtd/5"
+
+void
+nvram_unset_CSRF_all(const char *s,int type)
+{
+	struct varinit *vp;
+	int i=0;
+
+	if (shm_flag)
+		attach_share_memory();
+	
+	char *name_tmp = (char*)malloc(sizeof(char));
+	
+	
+	INTOFF;
+
+	for ( i=0; i < VTABSIZE ; i++)
+	{
+		vp = (struct varinit *)get_addr(var_start[i]);				
+		for ( ;vp ; vp = (struct varinit*)get_addr(vp->next_offset))
+		{
+			char *name,*unset_type0;
+			if (vp->validated == 1) {
+				name=(char *)get_addr(vp->name_offset);
+				//xxx*
+				if(type==1)
+				{	
+					if (!strncmp(name, s , strlen(s))){
+						strcat(name_tmp,name);
+					}
+				}
+				//*xxx
+				else
+				{
+					int stl;
+					if((strlen(name)>strlen(s)))
+					{
+						unset_type0=name+(strlen(name)-strlen(s)-1);
+						stl = strlen(unset_type0)-1;
+						if (!strncmp(unset_type0 , s , stl)){
+							strcat(name_tmp,name);
+						}
+					}	
+				}
+			}
+		}
+	}
+	INTON;
+	
+	char *unset_tmp = strtok(name_tmp,"=");
+	while(unset_tmp != NULL)
+	{
+		nvram_unset(unset_tmp);
+		unset_tmp = strtok(NULL,"=");
+	}
+
+	free(name_tmp);
+	free(unset_tmp);
+
+	return;	
+}
+
+#define _PATH_CONFIG_MTD  "/dev/mtd/7"
 int
 nvram_unsetall(void)
 {
@@ -719,7 +753,9 @@ nvram_commit()
 	//char *argv[]={ "ls","-al","/etc",(char *)0};
 	int by_pass = 0;
 
+		
 	INTOFF;
+	
 	if (shm_flag)
 		attach_share_memory();
 
@@ -805,8 +841,10 @@ nvram_commit()
 		FILE *fp;
 		
 		fp = fopen("/tmp/commit", "r");
-		if (fp)
+		if (fp) {
+			fclose(fp);
 			system("/tmp/commit");
+		}
 		else	
 			system("/usr/sbin/commit");
 	}
@@ -1022,8 +1060,6 @@ nvram_init()
 
 		/* to default */
 		/*open NVRAM_DEFAULT file*/
-
-#if 0
 		fp_ptr=fopen(REGION_FILE_PATH, "r");
 		if (fp_ptr) {
 			fclose(fp_ptr);
@@ -1032,9 +1068,6 @@ nvram_init()
 		else {
 			fp_ptr=fopen(DEFAULT_FILE_PATH,"r");
 		}
-#else
-		fp_ptr=fopen(DEFAULT_FILE_PATH,"r");
-#endif
 		if (fp_ptr==NULL)
 		{
 			printf ("open %s error..\n",DEFAULT_FILE_PATH);
@@ -1097,86 +1130,64 @@ nvram_clean(void)
 
 }
 
-
 void nvram_default(void)
 {
 
-	char *line,*value,*name;
-	char *buf,*ptr;
-	int len = INIT_BUF_SIZE_LARGE;
-	FILE *fp_ptr=NULL;
+        char *line,*value,*name;
+        char *buf,*ptr;
+        int len = INIT_BUF_SIZE_LARGE;
+        FILE *fp_ptr=NULL;
 
-	printf("To nvram default ...\n");
-	if (shm_flag)
-		attach_share_memory();
-	//printf ("before realloc...poniter [%x]...\n",(int)pointer);
-	INTOFF_REALLOC;
-	pointer=ptr_start;
+        printf("To nvram default ...\n");
+        if (shm_flag)
+                attach_share_memory();
+        /*printf ("before realloc...poniter [%x]...\n",(int)pointer);*/
+        INTOFF_REALLOC;
+        pointer=ptr_start;
 
-	nvram_clean();
-	/*start initial data*/
-	ptr=ckmalloc(strlen(MAGIC_ID));
-	strcpy(ptr,MAGIC_ID);
-	ckmalloc(7);
-	var_start=ckmalloc(sizeof(int)*VTABSIZE);
+        nvram_clean();
+        /*start initial data*/
+        ptr=ckmalloc(strlen(MAGIC_ID));
+        strcpy(ptr,MAGIC_ID);
+        ckmalloc(7);
+        var_start=ckmalloc(sizeof(int)*VTABSIZE);
 
-	/*restore variables*/
-	line = malloc(INIT_BUF_SIZE_LARGE);
-	// if memory size is not available,  we may try to allocate smaller size
-	if (line == NULL)
-	{
-		line = malloc(INIT_BUF_SIZE_SMALL);
-		len = INIT_BUF_SIZE_SMALL;
-	}
+        /*restore variables*/
+        line = malloc(INIT_BUF_SIZE_LARGE);
+        /* if memory size is not available,  we may try to allocate smaller size */
+        if (line == NULL)
+        {
+                line = malloc(INIT_BUF_SIZE_SMALL);
+                len = INIT_BUF_SIZE_SMALL;
+        }
 
-	fp_ptr=fopen(DEFAULT_FILE_PATH,"r");
-	if (fp_ptr==NULL)
-	{
-		printf ("open %s error..\n",DEFAULT_FILE_PATH);
-	}
-	else
-	{
-		while(fgets(line,len,fp_ptr))
-		{
-			value=line;
-			name=line;
-			strsep(&value,"=");
-			if (value)
-			{
-				clear_end(value);
-				nvram_set(name,value);
-			}
-		}
-		fclose(fp_ptr);
-	}
+        fp_ptr=fopen(DEFAULT_FILE_PATH,"r");
+        if (fp_ptr==NULL)
+        {
+                printf ("open %s error..\n",DEFAULT_FILE_PATH);
+        }
+        else
+        {
+                while(fgets(line,len,fp_ptr))
+                {
+                        value=line;
+                        name=line;
+                        strsep(&value,"=");
+                        if (value)
+                        {
+                                clear_end(value);
+                                nvram_set(name,value);
+                        }
+                }
+                fclose(fp_ptr);
+        }
 
-#if 0
-	/*open NVRAM file*/
-	fp_ptr=fopen(TMP_FILE_PATH,"r+");
-	if (fp_ptr==NULL)
-	{
-		printf ("open %s error..\n",TMP_FILE_PATH);
-	}
-	else
-	{
-		while(fgets(line,len,fp_ptr))
-		{
-			value=line;
-			name=line;
-			strsep(&value,"=");
-			if (value)
-			{
-				clear_end(value);
-				nvram_set(name,value);
-			}
-		}
-		fclose(fp_ptr);
-	}
-#endif
+        free(line);
+        INTON_REALLOC;
 
-	free(line);
-	INTON_REALLOC;
 }
+
+
 
 
 void re_alloc(void)

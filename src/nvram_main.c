@@ -12,7 +12,7 @@ extern void nvram_show(void);
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: nvram [get name] [set name=value] [unset name] [show] [clean] [free]\n");
+	fprintf(stderr, "usage: nvram [get name] [set name=value] [unset name] [show] [clean]\n");
 	exit(0);
 }
 
@@ -72,12 +72,35 @@ main(int argc, char **argv)
 				}
 			}
 		}
-		else if (!strncmp(*argv, "free", 4)) {
-			nvram_free();
-		}
 		else if (!strncmp(*argv, "unset", 5)) {
 			if (*++argv)
-				nvram_unset(*argv);
+			{
+				char *index;
+				char *tmp_argv=(char*)malloc(sizeof(char));
+				int type;
+				index = strchr(*argv,'*');
+				if(index != NULL)
+				{
+					if((index-*argv+1)==1)
+					{
+						type=0;
+						strcpy(tmp_argv,*argv);
+						tmp_argv++;
+						nvram_unset_CSRF_all(tmp_argv,type);
+					}	
+					else if((index-*argv+1)==strlen(*argv))
+					{
+						type=1;
+						strncpy(tmp_argv,*argv,(strlen(*argv)-1));
+						nvram_unset_CSRF_all(tmp_argv,type);
+					}	
+					else
+						printf("unset all only accept *xx or xx*\n");
+					free(tmp_argv);	
+				}
+				else
+					nvram_unset(*argv);
+			}	
 		}
 		else if (!strncmp(*argv, "commit", 5)) {
 			nvram_commit();
@@ -98,9 +121,9 @@ main(int argc, char **argv)
 		else if (!strncmp(*argv, "realloc", 7)) {
 			re_alloc();
 		}
-		else if (!strncmp(*argv, "default", 7)) {
-			nvram_default();
-		}
+                else if (!strncmp(*argv, "default", 7)) {
+                        nvram_default();
+                }
 #if 0
 		else if (!strncmp(*argv, "default", 7)) {
 			FILE *fp;
@@ -112,10 +135,10 @@ main(int argc, char **argv)
 			else 
 				nvram_reload(DEFAULT_FILE_PATH);
 		}
+#endif
 		else if (!strncmp(*argv, "reload", 6)) {
 			nvram_reload(TMP_FILE_PATH);
 		}
-#endif
 		if (!*argv)
 			break;
 	}
