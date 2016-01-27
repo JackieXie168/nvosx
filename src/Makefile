@@ -38,9 +38,13 @@ $(DNILIB): $(SRCOBJ)
 $(SBINPGM): $(SOURCES_PGM) $(SRCOBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SOURCES_PGM) $(SRCOBJ) $(LIBS)
 	
-
+ifeq ($(GPL_CODE),1)
+clean:
+	rm -f *.c *.a *.so nvram
+else
 clean:
 	rm -f *.o *.a *.so nvram
+endif
 
 #ifneq "all" "clean"
 #  -include .depend

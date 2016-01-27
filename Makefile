@@ -69,10 +69,14 @@ endef
 define Package/dniutil/install
 	install -d -m0755 $(1)/etc/nvram
 	#$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD).default $(1)/etc/nvram/nvram.config
+ifeq ($(CONFIG_WEX_G300),y)
+	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-WEX-G300.default $(1)/etc/nvram/nvram.config
+else
 ifeq ($(CONFIG_FIRMWARE_REGION_EA),y)
 	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-WSR-300HP-EA.default $(1)/etc/nvram/nvram.config
 else
 	$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)-WSR-300HP.default $(1)/etc/nvram/nvram.config
+endif
 endif
 	#install -d -m0755 $(1)/etc/nvram_eu
 	#$(CP) -rf $(PKG_BUILD_DIR)/default/$(BOARD)_eu.default $(1)/etc/nvram_eu/nvram.config
