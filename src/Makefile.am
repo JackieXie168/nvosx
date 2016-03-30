@@ -1,38 +1,40 @@
-# $(top_srcdir)/Makefile.am
-#
-# AUTOMAKE_OPTIONS= foreign
+# Makefile.am
+AUTOMAKE_OPTIONS= foreign
 
+bin_PROGRAMS = nvramd
 if IS_DARWIN
-bin_PROGRAMS= xnvram
+bin_PROGRAMS+= invram
 else
-bin_PROGRAMS= nvram
+bin_PROGRAMS+= nvram
 endif
+
 
 #Build in these directories:
-
-COMMON_FILES=\
-	$(top_srcdir)/include/nvram.h \
-	$(top_srcdir)/include/typedefs.h
+COMMON_FILES=-I$(top_srcdir)/include/nvram.h
 
 NVRAM_FILES= $(COMMON_FILES) \
-	nvram.c \
-	nvram_main.c \
-	shutils.c
+	mtd.c \
+	nvram_defaults.c
+
+h_sources = $(top_srcdir)/include/nvram.h
+c_sources = mtd.c nvram_agent.c nvram_daemon.c nvram_defaults.c
 
 if IS_DARWIN
-xnvram_SOURCES= $(NVRAM_FILES)
+invram_SOURCES= nvram_socket.c nvram_agent.c
 else
-nvram_SOURCES= $(NVRAM_FILES)
+nvram_SOURCES= nvram_socket.c nvram_agent.c
 endif
 
-AM_CFLAGS= -I$(top_srcdir)/include
-#LIBS= -L/usr/lib -lpthread
+nvramd_SOURCES = nvramd.c $(c_sources)
 
-h_sources = $(top_srcdir)/include/nvram.h $(top_srcdir)/include/typedefs.h
-c_sources = nvram.c shutils.c
+AM_CFLAGS= -I$(top_srcdir)/include
+
+#LIBS= -L/usr/lib -lpthread
 
 library_includedir=$(includedir)/$(GENERIC_LIBRARY_NAME)-$(GENERIC_API_VERSION)/$(GENERIC_LIBRARY_NAME)
 library_include_HEADERS = $(h_sources)
+
+INCLUDES = -I$(top_srcdir)/include
 
 lib_LTLIBRARIES= libnvram-1.0.la
 libnvram_1_0_la_SOURCES= $(h_sources) $(c_sources)

@@ -1,12 +1,12 @@
-# configure.ac
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
 dnl AC_PREREQ(2.61)
-AC_INIT([nvram include/nvram.h],[v1.0],[Jackie.CPlusPlus@gmail.com])
-AM_INIT_AUTOMAKE(nvram, v1.0)         
+AC_INIT([src include/nvram.h],[v1.0],[Jackie.CPlusPlus@gmail.com])
+AM_INIT_AUTOMAKE(nvram, v1.0)
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl LT_INIT([dlopen])
 
@@ -148,7 +148,7 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([alarm bzero dup2 getdelim gettimeofday inet_ntoa memset memmove mkdir select setenv socket strchr strcspn strdup strerror strstr strncasecmp strcasecmp strspn strtol strtoul sysinfo])
+AC_CHECK_FUNCS([alarm bzero dup2 inet_ntoa memset mkdir select setenv socket strchr strcspn strncasecmp strcasecmp strspn strtol strtoul sysinfo])
 
 #
 # Modules configuration
@@ -158,26 +158,33 @@ os_is_macosx=false
 nonLinuxOS=false
 AC_SUBST(HostOS)
 case ${HostOS} in
-	darwin* | powerpc*-*-darwin*)
+	darwin* | powerpc*-*-darwin* | freebsd* | netbsd* | openbsd*)
+		userdefine_gethostbyname_r=true
 		os_is_macosx=true
 		nonLinuxOS=true
+		echo HostOS="$HostOS"
+		echo "userdefine_gethostbyname_r=true ..."
 		;;
 	*)
 		echo host="$host"
 		echo HostOS="$HostOS"
 		os_is_macosx=false
 		nonLinuxOS=false
-		echo "nonLinuxOS=false ..."
+		userdefine_gethostbyname_r=false
+		echo "userdefine_gethostbyname_r=false ..."
 		;;
 esac		
-
-AM_CONDITIONAL([NON_LINUX], [test x$nonLinuxOS = xtrue])
-AM_COND_IF([NON_LINUX],
-	[AC_DEFINE([NON_LINUX], [1], [Get HostOS Type])])
+AM_CONDITIONAL([USER_DEFINE_GETHOSTBYNAME_R], [test x$userdefine_gethostbyname_r = xtrue])
+AM_COND_IF([USER_DEFINE_GETHOSTBYNAME_R],
+	[AC_DEFINE([USER_DEFINE_GETHOSTBYNAME_R], [1], [Enable GETHOSTBYNAME_R module])])
 
 AM_CONDITIONAL([IS_DARWIN], [test x$os_is_macosx = xtrue])
 AM_COND_IF([IS_DARWIN],
 	[AC_DEFINE([IS_DARWIN], [1], [Get HostOS Type is Darwin])])
+
+AM_CONDITIONAL([NON_LINUX], [test x$userdefine_gethostbyname_r = xtrue])
+AM_COND_IF([NON_LINUX],
+	[AC_DEFINE([NON_LINUX], [1], [Get HostOS Type])])
 
 dnl Check for function sysctl (KERN_BOOTTIME)
 AC_MSG_CHECKING(for function sysctl (KERN_BOOTTIME))
@@ -244,8 +251,8 @@ AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
 AC_CONFIG_FILES([Makefile
-	src/Makefile
 	include/Makefile
+	src/Makefile
 	testcase/Makefile
 	conf/Makefile
 	host/Makefile

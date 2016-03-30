@@ -1,27 +1,5 @@
-Changelog
-	20150627
-		．extend nvram variable value's length.
-
-	20150421
-		．update for support cygwin
-
-	20141113
-		．fix that it cannot grep common string with grep issue.
-
-	20141107
-		．improve the file operations and security.
-		．improve the nvram actions behaviors.
-		．improve the return null issue in linux.
-		．correct $cfg path in test_nvram.sh 
-
-	20141103
-		．integrate parsing functions into nvram.
-
-	20091118
-		．add a 'test' example to verify nvram.
-
-	20091117 
-		．remove non-nvram functions.
-		．import nvram to Mac OS X.
-
-	Initial version
+Initial version
+20120710 
+	remove non-nvram functions.
+	import nvram to Mac OS X.
+	add a 'test' example to verify nvram.

@@ -1,6 +1,4 @@
-ACLOCAL_AMFLAGS = -I m4
-AM_LDFLAGS = -lm
+include_HEADERS = nvram.h
 
-include_HEADERS = nvram.h shutils.h typedefs.h
-
+#DISTCLEANFILES = Makefile.in
 CLEANFILES = *~ *.log

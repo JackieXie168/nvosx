@@ -1,0 +1,136 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.7	//
+ACTIONS	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	96;"	t	line:96	typeref:enum:__anon1
+ACT_HW_RESTORE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	95;"	e	line:95	enum:__anon1
+ACT_IDLE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	90;"	e	line:90	enum:__anon1
+ACT_SW_RESTORE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	94;"	e	line:94	enum:__anon1
+ACT_TFTP_UPGRADE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	91;"	e	line:91	enum:__anon1
+ACT_WEBS_UPGRADE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	93;"	e	line:93	enum:__anon1
+ACT_WEB_UPGRADE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	92;"	e	line:92	enum:__anon1
+BUFF_SPACE	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	50;"	d	line:50	file:
+BU_FAILURE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	71;"	d	line:71
+BU_SUCCESS	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	70;"	d	line:70
+CMD_BACKUP	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	118;"	e	line:118	enum:__anon2
+CMD_COMMIT	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	117;"	e	line:117	enum:__anon2
+CMD_DEFAULT	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	120;"	e	line:120	enum:__anon2
+CMD_GET	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	114;"	e	line:114	enum:__anon2
+CMD_GETALL	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	115;"	e	line:115	enum:__anon2
+CMD_RESTORE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	119;"	e	line:119	enum:__anon2
+CMD_SET	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	113;"	e	line:113	enum:__anon2
+CMD_UNSET	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	116;"	e	line:116	enum:__anon2
+CMIT_FAILURE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	75;"	d	line:75
+CMIT_SUCCESS	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	74;"	d	line:74
+CONF_PATH	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	136;"	d	line:136
+CONF_PATH	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	139;"	d	line:139
+CONF_PATH	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	144;"	d	line:144
+DFLT_FAILURE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	79;"	d	line:79
+DFLT_SUCCESS	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	78;"	d	line:78
+HTABLE_SIZE	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	48;"	d	line:48	file:
+MEMERASE	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	31;"	d	line:31	file:
+MEMGETINFO	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	30;"	d	line:30	file:
+NAME_SPACE	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	49;"	d	line:49	file:
+NUM_RETRIES	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	95;"	d	line:95	file:
+NVRAM_MTD_FILE	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	33;"	d	line:33	file:
+PATH_NVRAM_MTD	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	47;"	d	line:47	file:
+RAND_MAGIC	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	46;"	d	line:46	file:
+RSTR_ERRCSUM	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	67;"	d	line:67
+RSTR_ERRFILE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	66;"	d	line:66
+RSTR_SUCCESS	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	65;"	d	line:65
+SO_NO_CHECK	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	140;"	d	line:140
+UDP_CSUM_NOXMIT	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	84;"	d	line:84
+UDP_IPADDR	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	82;"	d	line:82
+UDP_PORT	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	81;"	d	line:81
+UDP_TIMEOUT	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	83;"	d	line:83
+VTABSIZE	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	123;"	d	line:123
+WORD_ALIGN	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	65;"	d	line:65	file:
+_NVRAM_H_	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	45;"	d	line:45
+_PATH_CONFIG	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	135;"	d	line:135
+_PATH_CONFIG	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	138;"	d	line:138
+_PATH_CONFIG	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	143;"	d	line:143
+__nvram_commit	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	240;"	f	line:240	file:	signature:(struct nvram_header *header)
+__nvram_free	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	111;"	f	line:111	file:	signature:(void)
+__nvram_get	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	173;"	f	line:173	file:	signature:(char *name)
+__nvram_getall	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	212;"	f	line:212	file:	signature:(struct nvram_header *header)
+__nvram_realloc	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	122;"	f	line:122	file:	signature:(struct nvram_tuple *t, char *name, char *value)
+__nvram_rehash	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	205;"	f	line:205	file:	signature:(struct nvram_header *header)
+__nvram_save	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	247;"	f	line:247	file:	signature:(struct nvram_header *header)
+__nvram_set	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	153;"	f	line:153	file:	signature:(char *name, char *value)
+__nvram_setall	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	185;"	f	line:185	file:	signature:(struct nvram_header *header)
+_srv_nvram_loop	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	464;"	f	line:464	file:	signature:(void)
+buff_offset	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	56;"	v	line:56	file:
+calc_magic	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	82;"	f	line:82	file:	signature:(uint8 *pdata, uint32 nbytes)
+calc_sum	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	70;"	f	line:70	file:	signature:(uint8 *pdata, uint32 nbytes, uint32 crc)
+config_ncdl	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	103;"	m	line:103	struct:nvram_header	access:public
+config_refresh	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	102;"	m	line:102	struct:nvram_header	access:public
+crc_ver_init	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	101;"	m	line:101	struct:nvram_header	access:public
+ctrl_buff	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	64;"	d	line:64	file:
+defaults_config	/Users/jackie/src/DNI/resources/nvram_socket/src/defaults.c	3;"	v	line:3	typeref:struct:nvram_tuple
+defaults_nvram	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_defaults.c	32;"	v	line:32	typeref:struct:nvram_struct
+do_nvram	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	93;"	f	line:93	file:	signature:(char cmd, char *arg[])
+eccsize	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	21;"	m	line:21	struct:mtd_info_user	file:	access:public
+ecctype	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	20;"	m	line:20	struct:mtd_info_user	file:	access:public
+erase_info_user	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	24;"	s	line:24	file:
+erasesize	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	17;"	m	line:17	struct:mtd_info_user	file:	access:public
+flags	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	15;"	m	line:15	struct:mtd_info_user	file:	access:public
+hashtbl	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	62;"	d	line:62	file:
+init_nvram	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	49;"	f	line:49	signature:(void)
+init_socket	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	57;"	f	line:57	file:	signature:(void)
+len	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	100;"	m	line:100	struct:nvram_header	access:public
+length	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	27;"	m	line:27	struct:erase_info_user	file:	access:public
+magic	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	99;"	m	line:99	struct:nvram_header	access:public
+main	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_socket.c	61;"	f	line:61	signature:(int argc, char *argv[])
+main	/Users/jackie/src/DNI/resources/nvram_socket/src/nvramd.c	32;"	f	line:32	signature:(int argc, char *argv[])
+main	/Users/jackie/src/DNI/resources/nvram_socket/testcase/test.c	6;"	f	line:6	signature:(void)
+mtd_info_user	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	12;"	s	line:12	file:
+mtd_read	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	92;"	f	line:92	signature:(const char *mtd, char *buf, int len)
+mtd_write	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	37;"	f	line:37	signature:(const char *mtd, char *buf, int len)
+name	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	107;"	m	line:107	struct:nvram_tuple	access:public
+name	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	127;"	m	line:127	struct:nvram_struct	access:public
+name_hash	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	95;"	f	line:95	file:	signature:(char *name)
+name_offset	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	57;"	v	line:57	file:
+next	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	109;"	m	line:109	struct:nvram_tuple	typeref:struct:nvram_tuple::nvram_tuple	access:public
+next	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	130;"	m	line:130	struct:nvram_struct	typeref:struct:nvram_struct::nvram_struct	access:public
+nvram_backup	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	225;"	f	line:225	signature:(char *ofile)
+nvram_buff	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	58;"	v	line:58	file:
+nvram_commit	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	211;"	f	line:211	signature:(void)
+nvram_default	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	202;"	f	line:202	signature:(void)
+nvram_fd	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	48;"	v	line:48	file:
+nvram_get	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	139;"	f	line:139	signature:(char *name)
+nvram_getall	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	197;"	f	line:197	signature:(void)
+nvram_hash	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	60;"	v	line:60	typeref:struct:nvram_tuple	file:
+nvram_header	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	98;"	s	line:98
+nvram_invmatch	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	40;"	f	line:40	signature:(char *name, char *invmatch)
+nvram_list	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_socket.c	40;"	f	line:40	file:	signature:(char *prefix, char *buf)
+nvram_match	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	32;"	f	line:32	signature:(char *name, char *match)
+nvram_name	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	59;"	v	line:59	file:
+nvram_restore	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	239;"	f	line:239	signature:(char *ifile)
+nvram_set	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	146;"	f	line:146	signature:(char *name, char *value)
+nvram_struct	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	125;"	s	line:125
+nvram_tuple	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	106;"	s	line:106
+nvram_unset	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_agent.c	190;"	f	line:190	signature:(char *name)
+oobblock	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	18;"	m	line:18	struct:mtd_info_user	file:	access:public
+oobsize	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	19;"	m	line:19	struct:mtd_info_user	file:	access:public
+put_str	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_socket.c	31;"	f	line:31	file:	signature:(char *str)
+restore_defaults	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	417;"	f	line:417	file:	signature:(void)
+size	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	16;"	m	line:16	struct:mtd_info_user	file:	access:public
+srv_nvram_backup	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	256;"	f	line:256	file:	signature:(int fd, struct sockaddr_in *from, socklen_t slen, char *ofile)
+srv_nvram_commit	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	381;"	f	line:381	file:	signature:(int fd, struct sockaddr_in *from, socklen_t slen)
+srv_nvram_default	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	398;"	f	line:398	file:	signature:(int fd, struct sockaddr_in *from, socklen_t slen)
+srv_nvram_get	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	353;"	f	line:353	file:	signature:(int fd, struct sockaddr_in *from, socklen_t slen, char *name)
+srv_nvram_getall	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	362;"	f	line:362	file:	signature:(int fd, struct sockaddr_in *from, socklen_t slen)
+srv_nvram_load	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	427;"	f	line:427	file:	signature:(void)
+srv_nvram_loop	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	536;"	f	line:536
+srv_nvram_restore	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	280;"	f	line:280	file:	signature:(int fd, struct sockaddr_in *from, socklen_t slen, char *ifile)
+srv_nvram_set	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	314;"	f	line:314	file:	signature:(int fd, struct sockaddr_in *from, socklen_t slen, char *buf)
+srv_nvram_unset	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	335;"	f	line:335	file:	signature:(int fd, struct sockaddr_in *from, socklen_t slen, char *name)
+start	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	26;"	m	line:26	struct:erase_info_user	file:	access:public
+type	/Users/jackie/src/DNI/resources/nvram_socket/src/mtd.c	14;"	m	line:14	struct:mtd_info_user	file:	access:public
+uint32	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	87;"	t	line:87
+uint8	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	86;"	t	line:86
+val_buff	/Users/jackie/src/DNI/resources/nvram_socket/src/nvram_daemon.c	63;"	d	line:63	file:
+value	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	108;"	m	line:108	struct:nvram_tuple	access:public
+value	/Users/jackie/src/DNI/resources/nvram_socket/include/nvram.h	128;"	m	line:128	struct:nvram_struct	access:public

@@ -1,4 +1,5 @@
 #!/bin/sh
+#Add by Timo Wu
 cd /tmp
 #cp -f /tmp/config/nvram.config /etc/nvram/back.config
 mkfs.jffs2 -r config -o config.bin -b --pad=0x10000 --erase=0x10000

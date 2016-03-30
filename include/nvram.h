@@ -1,4 +1,33 @@
 /*
+ * Copyright(c)
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the vendors nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
  * NVRAM variable manipulation
  *
  * Copyright 2004, Broadcom Corporation
@@ -9,37 +38,69 @@
  * SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
  * FOR A SPECIFIC PURPOSE OR NONINFRINGEMENT CONCERNING THIS SOFTWARE.
  *
+ * $Id: nvram.h,v 1.3.2.2 2008/06/11 08:36:04 jackie Exp $
  */
 
-#ifndef _nvram_h_
-#define _nvram_h_
+#ifndef _NVRAM_H_
+#define _NVRAM_H_
 
 #ifndef _LANGUAGE_ASSEMBLY
-#include <errno.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <semaphore.h>
 //#include <typedefs.h>
-#include <typedefs.h>
-#include <unistd.h>
-#include <shutils.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* the restore result */
+#define RSTR_SUCCESS	1
+#define RSTR_ERRFILE		2
+#define RSTR_ERRCSUM	3
+
+/* the backup result */
+#define BU_SUCCESS	1
+#define BU_FAILURE	2
+
+/* commit */
+#define CMIT_SUCCESS		1
+#define CMIT_FAILURE		2
+
+/* resetting to default */
+#define DFLT_SUCCESS		1
+#define DFLT_FAILURE		2
+
+#define UDP_PORT	2313
+#define UDP_IPADDR	0x7F000001	/* 127.0.0.1 */
+#define UDP_TIMEOUT	10
+#define UDP_CSUM_NOXMIT	1
+
+typedef unsigned char  uint8;
+typedef unsigned int   uint32;
+
+typedef enum { 
+	ACT_IDLE,
+	ACT_TFTP_UPGRADE,
+	ACT_WEB_UPGRADE,
+	ACT_WEBS_UPGRADE,
+	ACT_SW_RESTORE,
+	ACT_HW_RESTORE
+} ACTIONS;
 
 struct nvram_header {
 	uint32 magic;
 	uint32 len;
-	uint32 crc_ver_init;	/* 0:7 crc, 8:15 ver, 16:27 init, mem. test 28, 29-31 reserved */
-	uint32 config_refresh;	/* 0:15 config, 16:31 refresh */
-	uint32 config_ncdl;	/* ncdl values for memc */
+	uint32 crc_ver_init;			/* 0:7 crc, 8:15 ver, 16:27 init, mem. test 28, 29-31 reserved */
+	uint32 config_refresh;		/* 0:15 config, 16:31 refresh */
+	uint32 config_ncdl;			/* ncdl values for memc */
 };
 
 struct nvram_tuple {
@@ -48,208 +109,81 @@ struct nvram_tuple {
 	struct nvram_tuple *next;
 };
 
-#define VTABSIZE 127
-#define INIT_BUF_SIZE_LARGE 1638400
-#define INIT_BUF_SIZE_SMALL 2048
-
-struct varinit {
-	int name_offset;		/*offset of name string : ex. wan_proto=*/
-	int text_offset;		/*offset of value string : ex. pppoe*/
-	int next_offset;		/*offset of next varinit struct*/
-	unsigned short len;
-	unsigned short validated;
+enum {
+	CMD_SET = 1,
+	CMD_GET,
+	CMD_GETALL,
+	CMD_UNSET,
+	CMD_COMMIT,
+	CMD_BACKUP,
+	CMD_RESTORE,
+	CMD_DEFAULT
 };
 
-#define INTOFF sem_up(sem_id)		/*set semaphore*/
-#define INTON sem_down(sem_id)		/*unset semaphore*/
-#define INTOFF_REALLOC sem_up(sem_id_realloc)		/*set semaphore*/
-#define INTON_REALLOC sem_down(sem_id_realloc)	/*unset semaphore*/
+#define VTABSIZE 127
 
-/*share memory identifier (note. must greater than share memory size)*/
-#define NVRAMKEY 655350
-/*share memory size*/
-#define SHARESIZE 65536*30
-#define MAGIC_ID "<NVRAM>"
+struct nvram_struct 
+{
+	char	*name;
+	char	*value;
 
-#if __linux__ || defined(__CYGWIN__)
-#define _PATH_CONFIG						concat(safe_getenv("HOME"), "/tmp/conf")
-#define CONF_PATH							concat(_PATH_CONFIG, "/")
+	struct nvram_struct	*next;
+};
+
+#if __linux__
+//#define TARGET_DEVICE					DV_E5322S_R
+#define _PATH_CONFIG						"/var/OpenAgentV2/conf"
+#define CONF_PATH							_PATH_CONFIG "/"
 #elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX) || defined(darwin)
-#define _PATH_CONFIG						concat(safe_getenv("HOME"), "/var/conf")
-#define CONF_PATH							concat(_PATH_CONFIG, "/")
-//#define SO_NO_CHECK     				0xb
-#define SO_NO_CHECK     				0x100a
-#elif defined(_MSC_VER) || defined(__MINGW32__)
-#define _PATH_CONFIG						concat(safe_getenv("HOMEDRIVE"), safe_getenv("HOMEPATH"), "\\temp")
-#define CONF_PATH							concat(_PATH_CONFIG, "\\")
-#include <inttypes.h>
-#define inline
+#define _PATH_CONFIG						"/var/conf"
+#define CONF_PATH							_PATH_CONFIG "/"
+#define SO_NO_CHECK     				0xb
+//#define SO_NO_CHECK     				0x100a
+#elif defined(__CYGWIN__) || defined(_MSC_VER)
+#define _PATH_CONFIG						"c:\temp"
+#define CONF_PATH							_PATH_CONFIG "\"
 #endif
 
 #ifdef TARGET_DEVICE
 #define _PATH_CONFIG						"/tmp"
-#define _PATH_CONFIG_MTD					"/dev/mtd/5"
-#define TMP_FILE_PATH 						"/flash/nvram.config"
-#define DEFAULT_FILE_PATH 					"/etc/nvram/nvram.config"
-#define DEFAULT_FILE_PATH_EU				"/etc/nvram_eu/nvram.config"
-#define REGION_FILE_PATH 					"/tmp/firmware_region"
+#define _PATH_CONFIG_MTD			"/dev/mtd/5"
+#define TMP_FILE_PATH 					"/flash/nvram.config"
+#define DEFAULT_FILE_PATH 		"/etc/nvram/nvram.config"
+#define DEFAULT_FILE_PATH_EU	"/etc/nvram_eu/nvram.config"
+#define REGION_FILE_PATH 			"/tmp/firmware_region"
 //#define TMP_FILE_PATH "/tmp/config/nvram.config"
 //##define TMP_FILE_PATH "/var/run/rc.conf"
 #else
-#define LOG_FILE_PATH 						concat(CONF_PATH, "nvram.log")
-#define BACKUP_FILE_PATH 					concat(CONF_PATH, "nvram.bak")
-#define DEFAULT_FILE_PATH 					concat(CONF_PATH, "nvram.default")
-#define DEFAULT_FILE_PATH_EU 				concat(CONF_PATH, "nvram_eu.conf")
-#define REGION_FILE_PATH 					concat(CONF_PATH, "firmware_region")
-#define ACTION_FILE     					concat(CONF_PATH, "action")
-#define TMP_FILE_PATH 						concat(CONF_PATH, "nvram.conf")
-#define _PATH_CONFIG_MTD					TMP_FILE_PATH
+#define LOG_FILE_PATH 					CONF_PATH "invram.log"
+#define BACKUP_FILE_PATH 			CONF_PATH "invram.bak"
+#define DEFAULT_FILE_PATH 		CONF_PATH "invram.conf"
+#define DEFAULT_FILE_PATH_EU 	CONF_PATH "invram_eu.conf"
+#define REGION_FILE_PATH 			CONF_PATH "firmware_region"
+#define ACTION_FILE     					CONF_PATH "action"
+#define TMP_FILE_PATH 					DEFAULT_FILE_PATH
+#define _PATH_NVRAM_MTD			TMP_FILE_PATH
 #endif
-
-#define COMMIT_PROG						concat(safe_getenv("HOME"), "/bin/commit")
 
 #define ERR_NO_MEM -1
 
-//void *xmalloc(size_t sz);
-void dump_mem(void*,int);
-int nvram_init();
-void attach_share_memory(void);
-void nvram_clean(void);
-void re_alloc(void);
-void detach_shm(void);
-
-/* NOTE: when successfully `fork()', calling this to re-initialized the nvram. */
-extern void init_nvram(void);
-extern int nvram_invmatch(char *name, char *match);
+/* nvram agent functions */
 extern int nvram_match(char *name, char *match);
-extern int nvram_commit(void);
-extern char *nvram_free();
-extern char *nvram_get(const char *name);
-extern int nvram_set(const char *name, const char *val);
-extern int nvram_unset(const char *s);
+extern int nvram_invmatch(char *name, char *match);
+extern void nvram_set(char *name, char *value);
+extern void nvram_unset(char *name);
+extern void nvram_default(void);
+extern void nvram_commit(void);
+extern char *nvram_get(char *name);
+extern char *nvram_getall(void);
+extern int nvram_backup(char *ofile);
+extern int nvram_restore(char * ifile);
 
-/*
- * Initialize NVRAM access. May be unnecessary or undefined on certain
- * platforms.
- */
-#if 0
-extern int BCMINIT(nvram_init)(void *sbh);
-#endif
+/* nvram daemon functions */
+extern void srv_nvram_loop();
 
-/*
- * Disable NVRAM access. May be unnecessary or undefined on certain
- * platforms.
- */
-extern void BCMINIT(nvram_exit)(void);
-
-/*
- * Get the value of an NVRAM variable. The pointer returned may be
- * invalid after a set.
- * @param	name	name of variable to get
- * @return	value of variable or NULL if undefined
- */
-extern char * BCMINIT(nvram_get)(const char *name);
-
-/* 
- * Get the value of an NVRAM variable.
- * @param	name	name of variable to get
- * @return	value of variable or NUL if undefined
- */
-#define nvram_safe_get(name) (BCMINIT(nvram_get)(name) ? : "")
-
-#define nvram_safe_get_x(sid, name) (nvram_get_x(sid, name) ? : "")
-#define nvram_safe_get_f(file, field) (nvram_get_f(file, field) ? : "")
-
-/* 
- * Get the value of an NVRAM variable.
- * @param	name	name of variable to get
- * @return	value of variable or NUL if undefined
- */
-//#define nvram_safe_get(name) (nvram_get(name) ? : "")
-
-#define nvram_safe_unset(name) ({ \
-	if(nvram_get(name)) \
-		nvram_unset(name); \
-})
-
-#define nvram_safe_set(name, value) ({ \
-	if(!nvram_get(name) || strcmp(nvram_get(name), value)) \
-		nvram_set(name, value); \
-})
-
-/*
- * Match an NVRAM variable.
- * @param	name	name of variable to match
- * @param	match	value to compare against value of variable
- * @return	TRUE if variable is defined and its value is string equal
- *		to match or FALSE otherwise
- */
-#if 0
-static INLINE int
-nvram_match(char *name, char *match) {
-	const char *value = BCMINIT(nvram_get)(name);
-	return (value && !strcmp(value, match));
-}
-#endif
-/*
- * Inversely match an NVRAM variable.
- * @param	name	name of variable to match
- * @param	match	value to compare against value of variable
- * @return	TRUE if variable is defined and its value is not string
- *		equal to invmatch or FALSE otherwise
- */
-#if 0
-static INLINE int
-nvram_invmatch(char *name, char *invmatch) {
-	const char *value = BCMINIT(nvram_get)(name);
-	return (value && strcmp(value, invmatch));
-}
-#endif
-/*
- * Set the value of an NVRAM variable. The name and value strings are
- * copied into private storage. Pointers to previously set values
- * may become invalid. The new value may be immediately
- * retrieved but will not be permanently stored until a commit.
- * @param	name	name of variable to set
- * @param	value	value of variable
- * @return	0 on success and errno on failure
- */
-extern int BCMINIT(nvram_set)(const char *name, const char *value);
-
-/*
- * Unset an NVRAM variable. Pointers to previously set values
- * remain valid until a set.
- * @param	name	name of variable to unset
- * @return	0 on success and errno on failure
- * NOTE: use nvram_commit to commit this change to flash.
- */
-extern int BCMINIT(nvram_unset)(const char *name);
-
-/*
- * Commit NVRAM variables to permanent storage. All pointers to values
- * may be invalid after a commit.
- * NVRAM values are undefined after a commit.
- * @return	0 on success and errno on failure
- */
-extern int BCMINIT(nvram_commit)(void);
-
-/*
- * Get all NVRAM variables (format name=value\0 ... \0\0).
- * @param	buf	buffer to store variables
- * @param	count	size of buffer in bytes
- * @return	0 on success and errno on failure
- */
-extern int BCMINIT(nvram_getall)(char *buf, int count);
+#define ACTION(cmd)     buf_to_file(ACTION_FILE, cmd)
 
 #endif /* _LANGUAGE_ASSEMBLY */
-
-#define NVRAM_MAGIC		0x48534C46	/* 'FLSH' */
-#define NVRAM_VERSION		1
-#define NVRAM_HEADER_SIZE	20
-#define NVRAM_SPACE		0x1600000
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-#endif /* _nvram.h_ */
+#define NVRAM_MAGIC					0x48534C46	/* 'FLSH' */
+#define NVRAM_SPACE						0x80000
+#endif /* _NVRAM_H_ */

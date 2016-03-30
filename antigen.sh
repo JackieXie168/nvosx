@@ -15,8 +15,13 @@ fi
 # Remove all tar-files (assuming there are some packages).
 rm -f *.tar.* *.tgz
 # Also remove the autotools cache directory.
-rm -Rf autom4te.cache
+rm -Rf autom4te.cache m4
 # Remove rest of the generated files.
-rm -f aclocal.m4 configure config.h.in depcomp install-sh missing compile config.* configure.scan test-driver ltmain.sh
+rm -f aclocal.m4 configure config.h.in depcomp install-sh missing test-driver
 find . -name Makefile.in -exec rm -f {} \;
 find . -name *~ -exec rm -f {} \;
+host_os=`uname -s`
+if [ "$host_os" = "Darwin" -o  "$host_os" = "FreeBSD" ]; then
+        echo "Rebuild tags, please wait ..."
+        /Applications/BBEdit.app/Contents/Helpers/ctags --excmd=number --tag-relative=no --fields=+a+m+n+S -R `pwd`
+fi

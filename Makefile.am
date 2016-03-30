@@ -1,13 +1,12 @@
-# $(top_srcdir)/Makefile.am
-#
-# AUTOMAKE_OPTIONS= foreign
+# adding doxygen support
+# include $(top_srcdir)/aminclude.am
+ACLOCAL_AMFLAGS=-I m4
 
-## Source directory
-SUBDIRS= src include conf host testcase
+SUBDIRS=src include testcase conf host
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = $(top_srcdir)/nvram-1.0.pc
-
+pkgconfig_DATA = nvram-1.0.pc
 EXTRA_DIST=autogen.sh
 
+DISTCLEANFILES = Makefile.in aclocal.m4 compile config.guess config.sub configure configure.scan ltmain.sh
 CLEANFILES = *~ *.log
