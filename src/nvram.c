@@ -26,7 +26,10 @@ static char nullstr[1];	/* zero length string */
 char shm_flag=1;			/*check to attach share memory */
 char realloc_flag=0;		/*prevent re_alloc function causing deadlock*/
 char flag_reload_nvram=0;
-int *var_start;				/*start address of hash table*/
+
+int *var_start;			/*start address of hash table*/
+
+char nvram_set_flag = 0;
 
 #define BOUNDARY_4X(x)	(x = (int)(x + 3) & 0xfffffffc)	/* X4 alignment */
 
@@ -103,6 +106,10 @@ inline void detach_shm(void)
 #endif
 }
 
+#define OS_VERSION	"1.0.1"
+#define REVISION	"RC0"
+
+const char *version_string = OS_VERSION REVISION;
 void attach_share_memory()
 {
 	int shmid;
@@ -115,9 +122,9 @@ void attach_share_memory()
 			perror ("attach_share_memory failed, shmid is -1");
 	}
 	pointer=shmat(shmid,(void *)0, 0);
-	
+
 	shm_flag=0;
-	
+
 	ptr_start=pointer;
 	/*set semaphore*/
 	if ((sem_id = semget(NVRAMKEY, 1, IPC_CREAT | 0666)) == -1)
@@ -129,7 +136,7 @@ void attach_share_memory()
 	{
 		perror("semget error");
 	}
-	
+
 	nvram_init();
 }
 
@@ -140,7 +147,7 @@ void *get_curr_pos()
 	/*skip MAGIC_ID*/
 	//tmp+=6;
 	tmp+=8;
-	
+
 	offset=atol(tmp);
 
 	return (void *)(ptr_start+offset);
@@ -155,9 +162,9 @@ void *ckmalloc(size_t size)
 	ptr=(char *)get_curr_pos();
 	/* add 1 byte for NULL character*/
 	p=ptr+size+1;
-	
+
 		BOUNDARY_4X(p);
-	
+
 	/*if out of share memory then re-allocate share memory*/
 	if (p>=tmp+SHARESIZE)
 	{
@@ -167,7 +174,7 @@ void *ckmalloc(size_t size)
 		re_alloc();
 		ptr=(char *)get_curr_pos();
 		p=ptr+size+1;
-			BOUNDARY_4X(p);	
+			BOUNDARY_4X(p);
 		/*if still out of share memory then return NULL*/
 		if (p>=tmp+SHARESIZE)
 		{
@@ -175,7 +182,7 @@ void *ckmalloc(size_t size)
 			return NULL;
 		}
 	}
-	
+
 	tmp+=(strlen(MAGIC_ID)+1);
 	i=atol(tmp);
 	i+=(size+1);
@@ -196,7 +203,7 @@ inline void *get_addr(int offset)
 	ptr=(char *)ptr_start;
 	if (offset > (SHARESIZE-1)||offset<=0) {
 		return NULL;
-	}	
+	}
 	return (void *)(ptr+offset);
 }
 
@@ -453,8 +460,8 @@ nvram_free()
 		total = SHARESIZE;
 		used = (unsigned long)(ptr - (char *)ptr_start);
 		remain = SHARESIZE - used;
-		p = tmpbuf2;
 
+		p = tmpbuf2;
 		if(total/1000){
 			sprintf(tmpbuf1, "Total=%lu.%03d KB, ", total/1000, total%1000);
 		}else
@@ -473,7 +480,7 @@ nvram_free()
 			sprintf(tmpbuf1, "Remain=%lu B", remain);
 		strcat(p,tmpbuf1);
 		//p+=strlen(tmpbuf1);
-			
+
 		printf("%s\n", tmpbuf2);
 	}
 	return NULL;
@@ -485,16 +492,26 @@ nvram_get(name)
 {
 	int *offset;
 	struct varinit *v,*vp;
-	
+	char *name;
+
 	if (shm_flag)
 		attach_share_memory();
+
 	INTOFF;
+	if (strcmp(name_org, "_action_") == 0) {		/* action queue */
+		name = "action";
+	}
+	else
+		name = name_org;
 	hashvar(name,&offset);
 	vp=(struct varinit*)get_addr(*offset);
 	if ((v = findvar(vp, name))) {
 		if (v->validated == 1) {
-			INTON;
-			//printf("nvram_get found %s :: %s\n",name,(char *)get_addr(v->text_offset));
+			if (strcmp(name_org, "_action_") == 0) {		/* action queue */
+				v->validated = 0;
+			}
+			
+			INTON;				
 			return (char *)get_addr(v->text_offset);
 		}
 	}
@@ -514,19 +531,23 @@ int
 nvram_set(name, val)
 	const char *name, *val;
 {
-//	const char *p;
+/*	const char *p; */
 	int len,*ptr;
 	int namelen;
 	char *line,*nameeq;
 	int name_offset,value_offset;
 	struct varinit *vp, *vpp;
-	char *action_ptr;	
+	char *action_ptr;
 
+	nvram_set_flag=1;
 	if (shm_flag)
 		attach_share_memory();
-	
-//	p = name;
-//	p=strchr(p,'\0');
+	nvram_set_flag=0;	
+	if (val == NULL)
+		return 0;
+
+/*	p = name;
+//	p=strchr(p,'\0'); */
 	namelen = strlen(name);
 	if (val)
 		len  = strlen(val);
@@ -540,8 +561,8 @@ nvram_set(name, val)
 		if (action_ptr) {
 			len += strlen(action_ptr);
 			len += 2;
-		}	
-	}		
+		}
+	}
 #endif
 
 	line=malloc(namelen+len+2);
@@ -572,7 +593,10 @@ nvram_set(name, val)
 		{
 			if (len)
 			{
-				memcpy(tmp , val, len);
+				if (action_ptr)
+					sprintf(tmp,"%s %s",  action_ptr, val);
+				else
+					memcpy(tmp , val, len);
 				tmp[len]='\0';
 			}
 //			else
@@ -595,9 +619,13 @@ nvram_set(name, val)
 			}
 			value_offset=get_offset(nameeq);
 
-			if (len) 
-				memcpy(nameeq , val, len);
-//			else 
+			if (len){
+				if (action_ptr)
+					sprintf(nameeq,"%s %s",  action_ptr, val);
+				else
+					memcpy(nameeq , val, len);
+			}
+/*			else */
 				nameeq[len] = '\0';
 			vp->text_offset = value_offset;
 			vp->len = len;			
@@ -621,9 +649,9 @@ nvram_set(name, val)
 			return ERR_NO_MEM;
 		}
 		value_offset=get_offset(nameeq);
-		if (len) 
+		if (len)
 			memcpy(nameeq , val, len);
-//		else 
+/*		else */
 			nameeq[len] = '\0';
 
 		/*allocate memory for name and get the offset*/
@@ -657,30 +685,188 @@ nvram_set(name, val)
 				INTON;
 			return ERR_NO_MEM;
 		}
+		
 		vp->name_offset = name_offset;
 		vp->text_offset = value_offset;
 		vp->next_offset = get_offset(vpp);
 		vp->len = value_len;
 		vp->validated = 1;
-		
+
 		/*record current varinit offset to the entry of hash table*/
 		*ptr = get_offset(vp);
-		//printf ("nvram_set found no var :: set %s=%s\n",(char *)get_addr(name_offset),
-		//	(char *)get_addr(value_offset));
+		/*printf ("nvram_set found no var :: set %s=%s\n",(char *)get_addr(name_offset),
+			(char *)get_addr(value_offset)); */
 	}
 	if (!realloc_flag)
 		INTON;
 	free(line);
 
 #ifdef TARGET_DEVICE
-	//send a signal to update nvram in monitor.sh immediately
+	/*send a signal to update nvram in monitor.sh immediately */
 	if (strcmp(name, "action") == 0) {
-		//system("killall -SIGUSR1 sleep.sh");
+		/*system("killall -SIGUSR1 sleep.sh"); */
 		system("killall -9 alarm");
 	}
 #endif
 	set_nvram_log(1);
 	
+	return 0;
+
+}
+
+int
+nvram_set_no_sem(name, val)
+	const char *name, *val;
+{
+/*	const char *p; */
+	int len,*ptr;
+	int namelen;
+	char *line,*nameeq;
+	int name_offset,value_offset;
+	struct varinit *vp, *vpp;
+	char *action_ptr;
+
+	if (shm_flag)
+		attach_share_memory();
+
+/*	p = name;
+//	p=strchr(p,'\0'); */
+	namelen = strlen(name);
+	if (val)
+		len  = strlen(val);
+	else
+		len=0;
+
+	action_ptr = NULL;
+	if (strcmp(name, "action") == 0) {		/* action queue */
+
+		action_ptr=nvram_get("action");
+		if (action_ptr) {
+			len += strlen(action_ptr);
+			len += 2;
+		}
+	}
+
+	line=malloc(namelen+len+2);
+
+	if (line==NULL)
+	{
+		printf("nvram_set :: malloc error...\n");
+		return ERR_NO_MEM;
+	}
+
+	if (action_ptr)
+		sprintf(line,"%s=%s %s",name, action_ptr, val);	
+	else
+		sprintf(line,"%s=%s",name,val);	
+	
+	hashvar(line,&ptr);
+	vpp=(struct varinit*)get_addr(*ptr);
+	vp = findvar(vpp, line);
+
+	if (vp)
+	{	
+/*		cprintf ("nvram_set found var :: set %s=%s\n",name,val); */
+		char *tmp=(char *)get_addr(vp->text_offset);
+		/*if the length of new value is larger than old one, it will allocate a new memory area*/
+		if ( (strlen(tmp)>=len) || (vp->len >= len) )
+		{			
+			if (len)
+			{
+				if (action_ptr)
+					sprintf(tmp,"%s %s",  action_ptr, val);
+				else
+					memcpy(tmp , val, len);
+				tmp[len]='\0';
+			}
+			else
+				tmp[len]='\0';
+		}
+		else
+		{		
+			nameeq = ckmalloc(len);
+			if (nameeq == ERR_NO_MEM) {
+				return ERR_NO_MEM;
+			}
+
+			if (nameeq==NULL)
+			{
+				return ERR_NO_MEM;
+			}
+			value_offset=get_offset(nameeq);
+
+			if (len){
+				if (action_ptr)
+					sprintf(nameeq,"%s %s",  action_ptr, val);
+				else
+					memcpy(nameeq , val, len);
+			}
+/*			else */
+				nameeq[len] = '\0';
+			vp->text_offset = value_offset;
+			vp->len = len;			
+		}
+		vp->validated = 1;
+	}
+	else
+	{		
+		unsigned short value_len = len;
+		/*allocate memory for value and get the offset*/
+		nameeq = ckmalloc(len);
+		if (nameeq == ERR_NO_MEM) {
+			return ERR_NO_MEM;
+		}
+		if (nameeq==NULL)
+		{
+			return ERR_NO_MEM;
+		}
+		value_offset=get_offset(nameeq);
+		if (len)
+			memcpy(nameeq , val, len);
+/*		else */
+			nameeq[len] = '\0';
+
+		/*allocate memory for name and get the offset*/
+		len = namelen + 2;              /* 2 is space for '=' and '\0' */
+		nameeq=ckmalloc(len);
+		if (nameeq == ERR_NO_MEM) {
+			return ERR_NO_MEM;
+		}
+		if (nameeq==NULL)
+		{
+			return ERR_NO_MEM;
+		}
+		name_offset=get_offset(nameeq);
+		memcpy(nameeq, name, namelen);
+		nameeq[namelen] = '=';
+
+		/*allocate memory for varinit and get the offset*/
+		vp = ckmalloc(sizeof (*vp));
+			if (vp == ERR_NO_MEM) {
+				return ERR_NO_MEM;
+			}
+		if (vp==NULL)
+		{
+			return ERR_NO_MEM;
+		}
+		vp->name_offset = name_offset;
+		vp->text_offset = value_offset;
+		vp->next_offset = get_offset(vpp);
+		vp->len = value_len;
+		vp->validated = 1;
+
+		/*record current varinit offset to the entry of hash table*/
+		*ptr = get_offset(vp);
+		/*printf ("nvram_set found no var :: set %s=%s\n",(char *)get_addr(name_offset),
+		//	(char *)get_addr(value_offset)); */
+	}
+	free(line);
+
+	/*send a signal to update nvram in monitor.sh immediately */
+	if (strcmp(name, "action") == 0) {
+		/*system("killall -SIGUSR1 sleep.sh"); */
+		system("killall -9 alarm");
+	}
 	return 0;
 
 }
@@ -723,10 +909,9 @@ nvram_unset(const char *s)
 
 	hashvar(s,&ptr);
 	vp=(struct varinit *)get_addr(*ptr);
-	
+
 	if (vp == NULL)
 		goto exit;
-	
 	if (varequal((char *)get_addr(vp->name_offset), s))
 	{
 		//*ptr=vp->next_offset;
@@ -746,7 +931,7 @@ nvram_unset(const char *s)
 	}
 	if (vp) 
 		vp->validated = 0;
-exit:	
+exit:
 	INTON;
 
 	return (0);
@@ -771,10 +956,10 @@ nvram_show()
 		{
 			char *name,*value;
 			int len;
-			
+
 			//printf("vp->name_offset = %08x\n", vp->name_offset);
-			//printf("vp->text_offset = %08x\n", vp->text_offset);	
-					
+			//printf("vp->text_offset = %08x\n", vp->text_offset);
+
 			if (vp->validated == 1) {
 				name=(char *)get_addr(vp->name_offset);
 				value=(char *)get_addr(vp->text_offset);
@@ -971,16 +1156,18 @@ int
 nvram_commit()
 {
 	struct varinit *vp;
-	int i;
+	int i,kk;
 	const char *sep = nullstr;
 	FILE *fp=NULL;
-	char *argv[]={ "commit",NULL,NULL,(char *)0};
+	char *argv[]={ "commit",(char *)0};
 	//char *argv[]={ "ls","-al","/etc",(char *)0};
-	
-	INTOFF;
+	int by_pass = 0;
+
+	//INTOFF;
 	if (shm_flag)
 		attach_share_memory();
 
+	INTOFF;
 	//fp=fopen(DEVICE_PATH,"w+");
 #ifndef TARGET_DEVICE
 	//printf ("\n\nNVRAM : Create configuration path : %s !!!\n", CONF_PATH);
@@ -1018,7 +1205,7 @@ nvram_commit()
 //#endif
 	}
 
-#if 0
+#ifndef TARGET_DEVICE
 	fp=fopen(TMP_FILE_PATH, "w+");
 	if (fp==NULL)
 	{
@@ -1027,6 +1214,12 @@ nvram_commit()
 		return -1;
 	}
 #endif
+
+	INTON;
+	if (nvram_get("keep_defaults") == NULL)
+			nvram_set("factory_default", "0");
+	nvram_unset("keep_defaults");
+	INTOFF;
 
 	//INTOFF;
 
@@ -1037,22 +1230,23 @@ nvram_commit()
 			if (vp->validated == 1) {
 				name=(char *)get_addr(vp->name_offset);
 #if defined(NVRAM_GOT_FROM_HW)
-					// To filter out HW related nvram vars
-					//printf("%s\n", name);
-					kk = 0;
-					while (nvram_by_pass_var[kk] != NULL) {
-						if( !strcmp(name, nvram_by_pass_var[kk]) ) {
-							by_pass=1;
-							break;
-						}
-						kk++;
+				//added by dvd.chen to filter out HW related nvram vars
+				//printf("%s\n", name);
+				kk = 0;
+				while (nvram_by_pass_var[kk] != NULL) {
+					if( !strcmp(name, nvram_by_pass_var[kk]) ) {
+						by_pass=1;
+						break;
 					}
+					kk++;
+				}
 
-					if(by_pass)	{
-						//printf("nvram_commit:: by_pass[%s]\n", name);
-						by_pass = 0;
-						continue;
-					}
+				if(by_pass)	{
+					//printf("nvram_commit:: by_pass[%s]\n", name);
+					by_pass = 0;
+					continue;
+				}
+				//end of dvd.chen
 #endif
 				value=(char *)get_addr(vp->text_offset);
 				fprintf(fp,"%s%s%s\n", sep, name, value);
@@ -1069,10 +1263,10 @@ int nvram_getall(char *buf, int count)
 	int i,len=0;
 	char *line;
 	struct varinit *vp;
-	
+
 	if (count==0)
 		return 0;
-	
+
 	if (shm_flag)
 		attach_share_memory();
 	if (!realloc_flag)
@@ -1089,7 +1283,7 @@ int nvram_getall(char *buf, int count)
 					continue;
 				}
 				value=(char *)get_addr(vp->text_offset);
-					line=malloc(strlen(name)+strlen(value)+2);
+				line=malloc(strlen(name)+strlen(value)+2);
 				if (line==NULL)
 					goto END;
 				sprintf(line,"%s%s", name, value);
@@ -1241,9 +1435,12 @@ nvram_init()
 	//printf ("pointer :: %x\n",(int) pointer);
 	//printf("nvram_init\n");
 #ifndef TARGET_DEVICE
-	if (flag_reload_nvram || strncmp(pointer,MAGIC_ID,strlen(MAGIC_ID))!=0)
+	//if (flag_reload_nvram || strncmp(pointer,MAGIC_ID,strlen(MAGIC_ID))!=0)
+	if ((nvram_set_flag == 0) && (flag_reload_nvram || strncmp(pointer,MAGIC_ID,strlen(MAGIC_ID))!=0))
 #else
-	if (strncmp(pointer,MAGIC_ID,strlen(MAGIC_ID))!=0)
+	//if (strncmp(pointer,MAGIC_ID,strlen(MAGIC_ID))!=0)
+	/* for nvram set shouldn't need to check magic number, suppose nvram had been initiated while doing nvram set */
+	if ((nvram_set_flag == 0) && (strncmp(pointer,MAGIC_ID,strlen(MAGIC_ID))!=0))
 #endif
 	{
 		line = malloc(INIT_BUF_SIZE_LARGE);
@@ -1265,9 +1462,10 @@ nvram_init()
 		//ckmalloc will add 1 byte
 		ckmalloc(7);
 		var_start=ckmalloc(sizeof(int)*VTABSIZE);
-		INTON;
+		//INTON;
 //		if (varid==-1)
 //			printf ("create share memory(var) error\n");
+
 		/* to default */
 		/*open NVRAM_DEFAULT file*/
 		fp_ptr=fopen(DEFAULT_FILE_PATH,"r");
@@ -1285,7 +1483,8 @@ nvram_init()
 				if (value)
 				{
 					clear_end(value);
-					nvram_set(name,value);
+					//nvram_set(name,value);
+					nvram_set_no_sem(name,value);
 				}
 			}
 			fclose(fp_ptr);
@@ -1317,17 +1516,21 @@ nvram_init()
 				if (value)
 				{
 					clear_end(value);
-					nvram_set(name,value);
+					//nvram_set(name,value);
+					nvram_set_no_sem(name,value);
 				}
 			}
 			fclose(fp_ptr);
 		}
 		free(line);
+		INTON;
 	}
 	else
 	{
 		//printf ("found MAGIC ID\n");
+		INTOFF;
 		init_share_ptr();
+		INTON;
 	}
 	if(!get_nvram_log())
 		set_nvram_log(0);
@@ -1434,6 +1637,8 @@ void nvram_default(void)
 		attach_share_memory();
 	//printf ("before realloc...poniter [%x]...\n",(int)pointer);
 	INTOFF_REALLOC;
+
+	INTOFF;
 	pointer=ptr_start;
 
 	nvram_clear();
@@ -1467,7 +1672,7 @@ void nvram_default(void)
 			if (value)
 			{
 				clear_end(value);
-				nvram_set(name,value);
+				nvram_set_no_sem(name,value);
 			}
 		}
 		fclose(fp_ptr);
@@ -1530,7 +1735,7 @@ void re_alloc(void)
 	strcpy(ptr,MAGIC_ID);
 	ckmalloc(7);
 	var_start=ckmalloc(sizeof(int)*VTABSIZE);
-	
+
 	ptr=buf;
 	/*restore variables*/
 	while(total_len > 0)
@@ -1544,8 +1749,9 @@ void re_alloc(void)
 		}
 		sprintf(line,"%s",ptr);
 //		len=strlen(line);
-		if (len==0)
+		if (len==0) {
 			break;
+		}
 		value=line;
 		name=line;
 		strsep(&value,"=");
@@ -1568,7 +1774,7 @@ void re_alloc(void)
 	}
 	realloc_flag=0;
 	INTON_REALLOC;
-	
+
 	free(buf);
 	//printf ("after realloc...poniter [%x]...\n",(int)pointer);
 }
