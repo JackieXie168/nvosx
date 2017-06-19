@@ -487,8 +487,8 @@ nvram_free()
 }
 
 char *
-nvram_get(name)
-	const char *name;
+nvram_get(name_org)
+	const char *name_org;
 {
 	int *offset;
 	struct varinit *v,*vp;
