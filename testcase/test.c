@@ -3,7 +3,7 @@
 */
 #include <nvram.h>
 #define config_get(name)  ((name != NULL) ? (nvram_get(name) != NULL ? nvram_get(name) : "") : "")
-#define cfg_get(name)	((name != NULL) ? (nvram_get(name) ? : "") : "")
+#define cfg_get(name)	(name ? (nvram_get(name) ? : "") : "")
 
 int main(void)
 {
@@ -22,7 +22,7 @@ int main(void)
 	printf("nvram_get(\"Asia/Kuala Lumpur\" is %s\n", nvram_get("Asia/Kuala Lumpur"));
 	printf("config_get(NULL) is %s\n", config_get(NULL));
 	printf("config_get(\"Asia/Taipei\") is %s\n", config_get("Asia/Taipei"));
-	printf("cfg_get(\"Asia/Beijin\") is %s\n", cfg_get("Asia/Beijin"));
+	printf("cfg_get(\"Asia/Beijing\") is %s\n", cfg_get("Asia/Beijing"));
 	printf("cfg_get(\"\") is %s\n", cfg_get(""));
 
 	return 0;
