@@ -1585,7 +1585,7 @@ file2str(const char *path)
 {
 	int fd;
 
-	if ((fd = open(path, O_RDONLY)) == -1) {
+	if ((fd = open(path, O_RDONLY, 0600)) == -1) {
 		perror(path);
 		return NULL;
 	}
@@ -1603,7 +1603,7 @@ int iLen;
 
 	iLen = strlen( string );
 	
-	if ((fd = open(path, O_CREAT | O_WRONLY | O_TRUNC ) )== -1)  {
+	if ((fd = open(path, O_CREAT | O_WRONLY | O_TRUNC, 0777))== -1)  {
 		perror(path);
 		return -1;
 	}
