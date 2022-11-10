@@ -45,7 +45,7 @@ typedef union {
 }semun;
 #endif
 
-inline void set_sem(int semid)
+void set_sem(int semid)
 {
 #if defined(__CYGWIN__)
 	semun sem_union;
@@ -57,7 +57,7 @@ inline void set_sem(int semid)
 		printf ("set sem error\n");
 }
 
-inline void sem_up(int semid)
+void sem_up(int semid)
 {
 	struct sembuf sem_b;
 
@@ -68,7 +68,7 @@ inline void sem_up(int semid)
 		printf ("semp p process error\n");
 }
 
-inline void sem_down(int semid)
+void sem_down(int semid)
 {
 	struct sembuf sem_b;
 
@@ -102,6 +102,12 @@ inline void detach_shm(void)
 	}
 #endif
 }
+
+
+#define INTOFF sem_up(sem_id)		/*set semaphore*/
+#define INTON sem_down(sem_id)		/*unset semaphore*/
+#define INTOFF_REALLOC sem_up(sem_id_realloc)		/*set semaphore*/
+#define INTON_REALLOC sem_down(sem_id_realloc)	/*unset semaphore*/
 
 void attach_share_memory()
 {

@@ -60,11 +60,6 @@ struct varinit {
 	unsigned short validated;
 };
 
-#define INTOFF sem_up(sem_id)		/*set semaphore*/
-#define INTON sem_down(sem_id)		/*unset semaphore*/
-#define INTOFF_REALLOC sem_up(sem_id_realloc)		/*set semaphore*/
-#define INTON_REALLOC sem_down(sem_id_realloc)	/*unset semaphore*/
-
 /*share memory identifier (note. must greater than share memory size)*/
 #define NVRAMKEY 655350
 /*share memory size*/
