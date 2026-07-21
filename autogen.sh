@@ -44,7 +44,7 @@ autoheader			&& \
 echo "- automake."		&& \
 automake --add-missing --gnu	&& \
 echo				&& \
-./configure "$@"		&& exit 0
+./configure "$@" --prefix=$HOME	&& exit 0
 
 exit 1
 

@@ -56,13 +56,13 @@ AC_SUBST(GENERIC_VERSION)
 
 VERSION=$GENERIC_VERSION
 
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION, no-define)
 
 AC_PREREQ
 dnl AC_REQUIRE_AUX_FILE([ltmain.sh])
 
 # Checks for programs.
 AC_LANG_CPLUSPLUS
+AC_PROG_AR
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
@@ -88,8 +88,6 @@ AM_SANITY_CHECK
 #DX_INIT_DOXYGEN($PACKAGE_NAME, doxygen.cfg)
 #
 
-AM_INIT_AUTOMAKE
-
 # Checks for libraries.
 
 # Checks for header files.
@@ -97,7 +95,7 @@ AC_HEADER_STDC
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 #AC_CHECK_HEADERS([fcntl.h limits.h malloc.h stddef.h stdlib.h string.h unistd.h])
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h limits.h netinet/in.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h termios.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h limits.h netinet/in.h stdlib.h string.h sys/file.h sys/ioctl.h sys/socket.h sys/time.h termios.h unistd.h])
 
 # Checks for command line options
 AC_ARG_ENABLE([async-exec],
