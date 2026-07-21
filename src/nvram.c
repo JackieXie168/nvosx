@@ -1579,3 +1579,77 @@ void re_alloc(void)
 	//printf ("after realloc...poniter [%x]...\n",(int)pointer);
 }
 
+/* ==================== config API implementation ==================== */
+
+char *
+config_get(const char *name)
+{
+    return nvram_get(name);
+}
+
+int
+config_set(const char *name, const char *value)
+{
+    return nvram_set(name, value);
+}
+
+int
+config_match(const char *name, const char *match)
+{
+    return nvram_match((char *)name, (char *)match);
+}
+
+int
+config_invmatch(const char *name, const char *invmatch)
+{
+    return nvram_invmatch((char *)name, (char *)invmatch);
+}
+
+int
+config_getall(char *buf, int count)
+{
+    return nvram_getall(buf, count);
+}
+
+int
+config_commit(void)
+{
+    return nvram_commit();
+}
+
+int
+config_default(void)
+{
+    nvram_default();
+    return 0;
+}
+
+/*
+* config_submit – Submit changes and execute external scripts (such as 
+restarting services)
+* This function has no direct equivalent to nvram_*, but can be implemented 
+using existing mechanisms:
+* 1. Call nvram_commit() to write to the archive
+* 2. Execute COMMIT_PROG or other post-commit actions
+*/
+int
+config_submit(void)
+{
+    int ret;
+
+    ret = nvram_commit();          /* First write to temporary archive */
+    if (ret != 0)
+        return ret;
+
+    /* Try executing /tmp/commit or COMMIT_PROG (from nvram.h) */
+    FILE *fp = fopen("/tmp/commit", "r");
+    if (fp) {
+        fclose(fp);
+        system("/tmp/commit");
+    } else {
+        system(COMMIT_PROG);       /* e.g. $HOME/bin/commit */
+    }
+
+    return 0;
+}
+

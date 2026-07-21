@@ -243,6 +243,16 @@ extern int BCMINIT(nvram_getall)(char *buf, int count);
 #define NVRAM_HEADER_SIZE	20
 #define NVRAM_SPACE		0x1600000
 
+/* === config API wrappers (map to nvram functions) === */
+extern char *config_get(const char *name);
+extern int   config_set(const char *name, const char *value);
+extern int   config_match(const char *name, const char *match);
+extern int   config_invmatch(const char *name, const char *invmatch);
+extern int   config_getall(char *buf, int count);
+extern int   config_commit(void);
+extern int   config_default(void);
+extern int   config_submit(void);   /* New feature: Submit and trigger subsequent actions */
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
