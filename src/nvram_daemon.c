@@ -223,7 +223,7 @@ static void __nvram_getall(struct nvram_header *header)
 	for (i = 0; i < HTABLE_SIZE; i++) {
 		for (t = hashtbl(i); t; t = t->next) {
 			if (t->name && t->value) {
-				fprintf(stderr, "DEBUG GETALL: %s=%s\n", t->name, t->value);
+				//fprintf(stderr, "DEBUG GETALL: %s=%s\n", t->name, t->value);
 				total++;
 			}
 			if ((ptr + strlen(t->name) + strlen(t->value) + 2) > end)
@@ -232,8 +232,7 @@ static void __nvram_getall(struct nvram_header *header)
 			ptr += sprintf(ptr, "%s=%s", t->name, t->value) + 1;
 		}
 	}
-	fprintf(stderr, "DEBUG GETALL: total vars = %d, raw_len = %ld\n",
-			total, (long)(ptr - (char *)&header[1]));
+	//fprintf(stderr, "DEBUG GETALL: total vars = %d, raw_len = %ld\n", total, (long)(ptr - (char *)&header[1]));
 
 	ptr += 2;
 
@@ -533,6 +532,12 @@ static void _srv_nvram_loop(void)
 	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
 		perror("bind");
 		goto ret;
+	}
+
+	// 增大傳送緩衝區，避免巨量資料封包被拒絕
+	int sndbuf = 262144;  // 256KB
+	if (setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &sndbuf, sizeof(sndbuf)) < 0) {
+		perror("setsockopt SO_SNDBUF");
 	}
 	srv_nvram_load();
 
