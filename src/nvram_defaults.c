@@ -29,7 +29,7 @@
  
  #include <nvram.h>
 
-struct nvram_struct defaults_nvram[] = 
+struct nvram_tuple defaults_nvram[] = 
 {
 	{ "netbiosname", "WNR612v2", 0 },
 	

@@ -199,6 +199,11 @@ char *nvram_getall(void)
 	return do_nvram(CMD_GETALL, NULL);
 }
 
+char *nvram_show(void)
+{
+	return do_nvram(CMD_SHOW, NULL);
+}
+
 void nvram_default(void)
 {
 	char *ret;

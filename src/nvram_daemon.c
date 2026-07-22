@@ -6,13 +6,13 @@
  * are permitted provided that the following conditions are met:
  *
  * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ *	this list of conditions and the following disclaimer.
  * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ *	this list of conditions and the following disclaimer in the documentation
+ *	and/or other materials provided with the distribution.
  * 3. Neither the name of the vendors nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ *	may be used to endorse or promote products derived from this software
+ *	without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -211,24 +211,29 @@ static void __nvram_rehash(struct nvram_header *header)
 
 static void __nvram_getall(struct nvram_header *header)
 {
-	int i;
+	int i, total = 0;
 	char *ptr, *end;
 	struct nvram_tuple *t;
 
 	ptr = (char *)&header[1];
 	memset(ptr, 0, NVRAM_SPACE - sizeof(struct nvram_header));
 
-	/* output all the tuples as: name=value\0 ... \0\0 */
 	end = (char *)header + NVRAM_SPACE - 2;
 
 	for (i = 0; i < HTABLE_SIZE; i++) {
 		for (t = hashtbl(i); t; t = t->next) {
+			if (t->name && t->value) {
+				fprintf(stderr, "DEBUG GETALL: %s=%s\n", t->name, t->value);
+				total++;
+			}
 			if ((ptr + strlen(t->name) + strlen(t->value) + 2) > end)
 				break;
 
 			ptr += sprintf(ptr, "%s=%s", t->name, t->value) + 1;
 		}
 	}
+	fprintf(stderr, "DEBUG GETALL: total vars = %d, raw_len = %ld\n",
+			total, (long)(ptr - (char *)&header[1]));
 
 	ptr += 2;
 
@@ -378,6 +383,40 @@ static void srv_nvram_getall(int fd, struct sockaddr_in *from, socklen_t slen)
 		free(header);
 }
 
+static void srv_nvram_show(int fd, struct sockaddr_in *from, socklen_t slen)
+{
+    int i, len = 1;
+    char *value = "";
+    struct nvram_tuple *t;
+    char *ptr, *end;
+    char *buf = NULL;
+
+    buf = malloc(NVRAM_SPACE);
+    if (buf == NULL)
+        goto send;
+
+    ptr = buf;
+    end = buf + NVRAM_SPACE - 2;
+
+    for (i = 0; i < HTABLE_SIZE; i++) {
+        for (t = hashtbl(i); t; t = t->next) {
+            if (t->name && t->value) {
+                int n = snprintf(ptr, end - ptr, "%s=%s\n", t->name, t->value);
+                if (n < 0 || ptr + n >= end)
+                    break;
+                ptr += n;
+            }
+        }
+    }
+    *ptr = '\0';
+    len = ptr - buf + 1;
+    value = buf;
+
+send:
+    sendto(fd, value, len, 0, (const struct sockaddr *)from, slen);
+    if (buf) free(buf);
+}
+
 static void srv_nvram_commit(int fd, struct sockaddr_in *from, socklen_t slen)
 {
 	struct nvram_header *hd;
@@ -417,11 +456,15 @@ static void srv_nvram_default(int fd, struct sockaddr_in *from, socklen_t slen)
 static void restore_defaults(void)
 {
 	struct nvram_tuple *t;
+	int count=0;
 
 	__nvram_free();
 
-	for (t = defaults_nvram; t->name; t++)
+	for (t = defaults_nvram; t->name; t++) {
 		__nvram_set(t->name, t->value);
+		count++;
+	}
+	fprintf(stderr, "DEBUG: restored %d defaults\n", count);
 }
 
 static void srv_nvram_load(void)
@@ -487,9 +530,10 @@ static void _srv_nvram_loop(void)
 #elif defined(__FreeBSD__) || defined(__APPLE__) || defined(MACOSX)
 	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &nocsum, sizeof(nocsum));
 #endif
-	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
+	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+		perror("bind");
 		goto ret;
-
+	}
 	srv_nvram_load();
 
 	printf("The data center is Running ...\n");
@@ -526,6 +570,8 @@ static void _srv_nvram_loop(void)
 			srv_nvram_backup(fd, &from, slen, buf + 1);
 		else if (cmd == CMD_RESTORE)
 			srv_nvram_restore(fd, &from, slen, buf + 1);
+		else if (cmd == CMD_SHOW)
+			srv_nvram_show(fd, &from, slen);
 	}
 
 ret:

@@ -117,7 +117,8 @@ enum {
 	CMD_COMMIT,
 	CMD_BACKUP,
 	CMD_RESTORE,
-	CMD_DEFAULT
+	CMD_DEFAULT,
+	CMD_SHOW          /* 新增：显示所有变量（格式化输出） */
 };
 
 #define VTABSIZE 127
@@ -175,6 +176,7 @@ extern void nvram_default(void);
 extern void nvram_commit(void);
 extern char *nvram_get(char *name);
 extern char *nvram_getall(void);
+extern char *nvram_show(void);
 extern int nvram_backup(char *ofile);
 extern int nvram_restore(char * ifile);
 

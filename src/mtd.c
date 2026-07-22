@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <dni_bcmnvram.h>
+#include <nvram.h>
 
 #if __linux__
 #include <sys/ioctl.h>
